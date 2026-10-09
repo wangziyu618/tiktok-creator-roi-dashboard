@@ -185,7 +185,7 @@ td.mono{font-family:var(--mono);font-size:12px;color:var(--t1)}
   <div class="topbar-inner">
     <span class="brand">TikTok <b>Creator ROI</b> Dashboard</span>
     <span class="spacer"></span>
-    <select id="week-select" title="切换周 / 全周期"></select>
+    <select id="week-select" title="数据范围"></select>
     <span class="meta-chip" id="scope-label"></span>
     <span class="meta-chip" id="data-updated"></span>
     <a href="docs/design-spec.html" target="_blank" rel="noopener">设计说明书</a>
@@ -205,17 +205,17 @@ td.mono{font-family:var(--mono);font-size:12px;color:var(--t1)}
   <header class="hero">
     <div class="eyebrow">TikTok Shop Affiliate · Commission-only · Pet Vertical</div>
     <h1>纯佣达人 ROI 运营看板</h1>
-    <p class="sub">无坑位费、成本仅为结算佣金 + 寄样成本的纯佣模式下，看板围绕三条主线：双口径 ROI（现金 / 全成本）、按漏斗状态的达人七层分层、以及「曝光 × CTR × CTOR × AOV」的 GMV 精确归因。</p>
+    <p class="sub">无坑位费、成本仅为结算佣金 + 寄样成本的纯佣模式下，看板围绕三条主线：双口径 ROI（现金 / 全成本）、按漏斗状态的达人七层分层、以及「曝光 × CTR × CTOR × AOV」的 GMV 精确归因。数据口径：2026-04-11 至今全周期（6 份重叠导出按达人去重合并）。</p>
     <div class="hl-chip" id="headline">加载中…</div>
   </header>
 
   <!-- ======== 模块一 ======== -->
   <section id="m1">
     <div class="sec-head"><span class="sec-num">MODULE 01</span><h2>核心指标概览</h2></div>
-    <p class="sec-desc">5 秒判断本周好坏：8 张 KPI 卡自带环比与口径注释；双 ROI 并列呈现，主动暴露纯佣模式的隐性样品成本。</p>
+    <p class="sec-desc">5 秒判断盘子好坏：8 张 KPI 卡自带口径注释；双 ROI 并列呈现，主动暴露纯佣模式的隐性样品成本与退款损耗。</p>
     <div class="kpi-grid" id="kpi-grid"></div>
     <div class="grid-31" style="margin-top:14px">
-      <div class="card"><h3>周度 GMV 与双口径 ROI</h3><div class="card-sub">柱 = GMV（左轴）· 蓝线 = 纯佣 ROI · 橙虚线 = 全成本 ROI（右轴）</div><div id="chart-combo"></div></div>
+      <div class="card"><h3>全周期 GMV 与双口径 ROI</h3><div class="card-sub">柱 = GMV（左轴）· 蓝线 = 纯佣 ROI · 橙虚线 = 全成本 ROI（右轴）</div><div id="chart-combo"></div></div>
       <div class="card"><h3>成本结构</h3><div class="card-sub">纯佣 ≠ 零成本：佣金 vs 样品</div><div id="chart-cost"></div></div>
     </div>
   </section>
@@ -223,7 +223,7 @@ td.mono{font-family:var(--mono);font-size:12px;color:var(--t1)}
   <!-- ======== 模块二 ======== -->
   <section id="m2">
     <div class="sec-head"><span class="sec-num">MODULE 02</span><h2>达人分层诊断</h2></div>
-    <p class="sec-desc">按「漏斗状态 + 产出」将达人切成 S/A/B/C/D/E/F 七层（而不是只按 GMV 排名——99.3% 的达人 GMV 为 0，按 GMV 排会整图空白）。核心问题：资源给了谁、回报来自谁。</p>
+    <p class="sec-desc">按「漏斗状态 + 产出」将达人切成 S/A/B/C/D/E/F 七层（而不是只按 GMV 排名——98.6% 的达人 GMV 为 0，按 GMV 排会整图空白）。核心问题：资源给了谁、回报来自谁。</p>
     <div class="grid-2">
       <div class="card"><h3>转化漏斗：邀约 → 破零</h3><div class="card-sub">逐级转化率标注</div><div id="chart-funnel"></div></div>
       <div class="card"><h3>七层 × 双占比</h3><div class="card-sub">人数分布 vs GMV 贡献 vs 样品消耗</div><div id="chart-tier"></div></div>
@@ -235,12 +235,12 @@ td.mono{font-family:var(--mono);font-size:12px;color:var(--t1)}
   <!-- ======== 模块三 ======== -->
   <section id="m3">
     <div class="sec-head"><span class="sec-num">MODULE 03</span><h2>ROI 多维度拆解</h2></div>
-    <p class="sec-desc">回答「数字为什么会变」。GMV 乘法链已用真实数据逐条反算验证（平均误差 0.3%），因此可以精确归因到因子级别。</p>
+    <p class="sec-desc">回答「数字为什么会变」。GMV 乘法链在聚合层面恒等成立（出单达人行级反算中位误差 0.3%），因此可以精确归因到因子级别。</p>
     <div class="card" style="margin-bottom:14px"><h3>GMV 乘法链</h3><div class="card-sub">Impressions × CTR × CTOR × AOV</div><div id="chart-chain"></div></div>
     <div class="grid-3">
       <div class="card"><h3>内容形态 GMV 结构</h3><div class="card-sub">短视频 / 直播 / 商品卡</div><div id="chart-donut"></div></div>
       <div class="card"><h3>CTR × CTOR 四象限</h3><div class="card-sub">虚线 = 出单达人中位数</div><div id="chart-quadrant"></div></div>
-      <div class="card"><h3>层级 × 周 GMV 热力</h3><div class="card-sub">复盘用：哪一周哪一层起量</div><div id="chart-heatmap"></div></div>
+      <div class="card"><h3>层级 × 周期 GMV 热力</h3><div class="card-sub">复盘用：哪一层起量</div><div id="chart-heatmap"></div></div>
     </div>
   </section>
 
@@ -257,7 +257,7 @@ td.mono{font-family:var(--mono);font-size:12px;color:var(--t1)}
       </div>
       <div class="card">
         <h3>干预对照（Before / After）</h3>
-        <div class="card-sub">策略效果追踪 · 累计数据满 2 周后启用</div>
+        <div class="card-sub">策略效果追踪 · 追加多期快照后启用</div>
         <div class="chart-note" style="margin-top:4px">
           在 <code>data/</code> 下维护 <code>D_Intervention.csv</code>（干预动作台账：达人 · 干预类型 · 干预周），
           以干预周为分界对比前 2 周 vs 后 2 周的同组达人 GMV / 激活率变化，并保留未干预对照组作基准。
@@ -278,8 +278,8 @@ td.mono{font-family:var(--mono);font-size:12px;color:var(--t1)}
   </section>
 
   <div class="footer">
-    <div><b>数据管道</b>：TikTok Shop 后台按周区间导出 → <code>scripts/prepare.py</code> 清洗加列 → 追加至 <code>data/weeks/</code> → <code>scripts/build_data.py</code> 重打包 → 本页自动包含全部周（纯静态、零依赖）。</div>
-    <div style="margin-top:6px"><b>校验</b>：<code>node scripts/test_dashboard.js</code> —— 91 项断言覆盖 KPI / 分层 / 漏斗 / 名单 / 渲染，与本页使用同一套计算逻辑。</div>
+    <div><b>数据管道</b>：TikTok Shop 后台导出（多份重叠窗口）→ <code>scripts/merge_all.py</code> 按达人去重合并为全周期口径 → <code>data/merged/</code> → <code>scripts/build_data.py</code> 重打包 → 本页自动呈现（纯静态、零依赖）。合并规则与冲突明细见 <code>data/merged/merge_log.txt</code>。</div>
+    <div style="margin-top:6px"><b>校验</b>：<code>node scripts/test_dashboard.js</code> —— 135 项断言覆盖 KPI / 分层 / 漏斗 / 名单 / 渲染，与本页使用同一套计算逻辑。</div>
     <div style="margin-top:6px"><b>样品成本口径</b>：$<span id="usc">5.0</span>/件（货值 + 头程物流），可在 <code>scripts/prepare.py</code> 中按真实口径调整。设计说明书：<a href="docs/design-spec.html" target="_blank" rel="noopener">Tableau 落地版</a>。</div>
   </div>
 

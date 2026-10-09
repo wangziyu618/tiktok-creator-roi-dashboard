@@ -1,0 +1,33 @@
+{
+  "generated": "2026-10-09",
+  "period_from": "2026-04-11",
+  "sources": [
+    {
+      "file": "ss.xlsx",
+      "rows": 1068
+    },
+    {
+      "file": "ss1.xlsx",
+      "rows": 731
+    },
+    {
+      "file": "ss2.xlsx",
+      "rows": 643
+    },
+    {
+      "file": "ss3.xlsx",
+      "rows": 483
+    },
+    {
+      "file": "ss4.xlsx",
+      "rows": 506
+    },
+    {
+      "file": "ss5.xlsx",
+      "rows": 252
+    }
+  ],
+  "raw_rows": 3683,
+  "union_creators": 1646,
+  "unit_sample_cost": 5.0
+}

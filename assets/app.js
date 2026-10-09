@@ -233,6 +233,7 @@
 
     return {
       scope, weeks: D.weeks, unitSampleCost: D.unit_sample_cost,
+      period: D.period || null,
       rows, creators, kpi, prev, weekSeries, heatmap, top, scatter, quadrant,
       funnel: funnelOf(creators),
       tiers: tiersOf(creators),
@@ -242,7 +243,10 @@
 
   function deltaHtml(cur, prev, fmt) {
     if (prev === null || prev === undefined) {
-      return '<span class="delta none" title="追加多周数据后自动显示环比">— 无上周数据</span>';
+      const isMerged = !!(globalThis.DATA && globalThis.DATA.period);
+      return '<span class="delta none" title="' +
+        (isMerged ? '当前为全周期合并口径，追加新快照后显示对比' : '追加多周数据后自动显示环比') +
+        '">— 无对比基线</span>';
     }
     const base = Math.abs(prev) < 1e-9
       ? (Math.abs(cur) < 1e-9 ? 0 : 1) : (cur - prev) / Math.abs(prev);
@@ -305,9 +309,14 @@
       '<div class="dlt">' + c.dlt + '</div>' +
       '<div class="sub">' + c.sub + '</div></div>').join('');
     if (oneWeek) {
-      html += '<div class="kpi-note">当前数据仅 1 周 · 每周向 ' +
-        '<code>data/weeks/</code> 追加 CSV 并重跑 <code>scripts/build_data.py</code>，' +
-        '趋势与环比自动点亮</div>';
+      html += m.period
+        ? '<div class="kpi-note">全周期合并口径：' + fmtNum(m.period.sources) + ' 份导出去重为 ' +
+          fmtNum(k.creators) + ' 位达人（' + m.period.from + ' → ' + m.period.to + '）。' +
+          '有新导出时重跑 <code>scripts/merge_all.py</code> + <code>scripts/build_data.py</code> 即可更新，' +
+          '追加多期快照后对比自动点亮。合并口径详见 <code>data/merged/merge_log.txt</code>。</div>'
+        : '<div class="kpi-note">当前数据仅 1 周 · 每周向 ' +
+          '<code>data/weeks/</code> 追加 CSV 并重跑 <code>scripts/build_data.py</code>，' +
+          '趋势与环比自动点亮</div>';
     }
     return html;
   }
@@ -358,7 +367,9 @@
     s += txt(w - padR + 8, padT + 24, 'x', { fill: BLUE, size: 9 });
     let out = svgWrap(w, h, s);
     if (m.weeks.length === 1) {
-      out += '<div class="chart-note">仅 1 周数据：蓝线 = 纯佣 ROI ' + fmtX(m.kpi.roiCash) +
+      out += '<div class="chart-note">' + (m.period ? '全周期合并口径（' + m.period.from + ' 起，' +
+        fmtNum(m.period.sources) + ' 份导出去重）' : '仅 1 周数据') +
+        '：蓝线 = 纯佣 ROI ' + fmtX(m.kpi.roiCash) +
         '，橙虚线 = 全成本 ROI ' + fmtX(m.kpi.roiFull) +
         '。两线的<strong>收敛速度</strong>是纯佣模式最核心的健康指标。</div>';
     }
@@ -386,8 +397,9 @@
       }
     });
     html += '</div>';
-    html += '<div class="chart-note">GMV = Impressions × CTR × CTOR × AOV（已用 8 位出单达人逐条反算验证，' +
-      '平均误差 0.3%）。<strong style="color:' + NEG + '">当前短板在 CTOR：CTR 2.21% 健康，' +
+    html += '<div class="chart-note">GMV = Impressions × CTR × CTOR × AOV（聚合层面恒等成立；' +
+      fmtNum(m.quadrant.ordered.length) + ' 位出单达人行级反算中位误差 0.3%）。' +
+      '<strong style="color:' + NEG + '">当前短板在 CTOR：CTR ' + fmtPct(k.ctr, 2) + ' 相对健康，' +
       'CTOR 仅 ' + fmtPct(k.ctor, 2) + '</strong> —— 每 ' + fmtNum(Math.round(1 / Math.max(k.ctor, 1e-9))) +
       ' 次点击才产生 1 单，问题出在落地页承接（评分 / 价格锚点 / 评价数），而非达人内容。</div>';
     return html;
@@ -435,7 +447,8 @@
     });
     return svgWrap(w, h, s) +
       '<div class="chart-note">破零率仅 <strong>' + fmtPct(safeDiv(m.funnel[5].n, m.funnel[0].n), 1) +
-      '</strong>；最大断层在「获得曝光 → 破零出单」。</div>';
+      '</strong>；最大断层在「获得曝光 → 破零出单」。注：「获得曝光」含商品卡 / 橱窗曝光，' +
+      '达人可无内容而获得曝光，故该级可高于「产出内容」级。</div>';
   }
 
   function renderTierShares(m) {
@@ -598,8 +611,10 @@
       '<div class="legend-row"><span><i style="background:' + p.c + '"></i>' + p.label +
       ' <b>' + fmtMoney(p.v, 2) + '</b>（' + fmtPct(safeDiv(p.v, total), 1) + '）</span></div>').join('');
     const note = '<div class="chart-note">' + fmtNum(k.videos) + ' 条短视频 + ' + fmtNum(k.lives) +
-      ' 场直播已产出；当前 GMV 100% 来自<strong>短视频</strong>，' +
-      (k.lives > 0 ? '<strong style="color:' + AMB + '">' + fmtNum(k.lives) + ' 场直播零转化</strong>——直播话术 / 排品值得复盘。</div>' : '</div>');
+      ' 场直播已产出；GMV 结构 = 短视频 <b>' + fmtPct(safeDiv(k.gmvVideo, total), 1) +
+      '</b> + 商品卡 <b>' + fmtPct(safeDiv(k.cardGmv, total), 1) + '</b>' +
+      (k.lives > 0 ? '；<strong style="color:' + AMB + '">' + fmtNum(k.lives) +
+        ' 场直播零转化</strong>——直播话术 / 排品值得复盘。</div>' : '</div>');
     return '<div style="display:flex;gap:22px;align-items:center;flex-wrap:wrap">' +
       svgWrap(220, 210, arcs + txt(cx, cy + 4, 'GMV', { anchor: 'middle', size: 12, fill: '#1D1D1F', weight: 700 })) +
       '<div style="flex:1;min-width:240px">' + legend + note + '</div></div>';
@@ -677,7 +692,8 @@
       });
     });
     return svgWrap(w, h, s) +
-      '<div class="chart-note">行 = 达人层级（按全周期累计 GMV 判定），列 = 周。追加数据后，这里用于定位"哪一周哪一层起量"。</div>';
+      '<div class="chart-note">行 = 达人层级（按全周期 GMV 判定），列 = 数据周期。' +
+      '当前为全周期单一快照；未来按期追加快照后，可在此定位"哪一期哪一层起量"。</div>';
   }
 
   function renderBullets(m, targets) {
@@ -747,7 +763,9 @@
       const d = safeDiv(k.gmv - m.prev.gmv, Math.abs(m.prev.gmv) || 1);
       s += '，环比 ' + (d >= 0 ? '+' : '') + fmtPct(d, 1);
     } else {
-      s += '（首期数据，环比待第二周点亮）';
+      s += m.period
+        ? '（' + m.period.from + ' 至今全周期累计，暂无对比基线）'
+        : '（首期数据，环比待第二周点亮）';
     }
     s += '；纯佣 ROI ' + fmtX(k.roiCash) + '，全成本 ROI ' + fmtX(k.roiFull) +
       'x；出单达人 ' + fmtNum(k.active) + ' 位（激活率 ' + fmtPct(k.activationRate, 1) +
@@ -857,6 +875,7 @@
   const targets = { 'Creator GMV': 500, '纯佣 ROI': 8, '出单达人': 20 };
 
   function scopeLabel(scope) {
+    if (model && model.period) return model.period.from + ' 至今 · 全周期';
     return scope === 'ALL' ? '全周期（' + model.weeks.length + ' 周）' : ('周：' + scope);
   }
 
@@ -882,26 +901,33 @@
     }));
     mount('headline', renderHeadline(model, scopeLabel(model.scope)));
     mount('table-area', renderTable(model));
-    document.getElementById('data-updated').textContent =
-      '数据更新：' + DATA.updated + ' · ' + DATA.weeks.length + ' 周 · ' +
-      fmtNum(DATA.rows.length) + ' 行';
+    document.getElementById('data-updated').textContent = model.period
+      ? '数据更新：' + DATA.updated + ' · ' + DATA.period.from + ' 至今 · ' +
+        fmtNum(DATA.period.sources) + ' 份导出 · ' + fmtNum(DATA.rows.length) + ' 位达人'
+      : '数据更新：' + DATA.updated + ' · ' + DATA.weeks.length + ' 周 · ' +
+        fmtNum(DATA.rows.length) + ' 行';
     document.getElementById('scope-label').textContent = scopeLabel(model.scope);
   }
 
   function init() {
     const D = global.DATA;
     if (!D) return;
-    // week selector
+    model = computeAll(D, 'ALL');
+    // week selector（merged 模式 = 全周期单快照；weekly 模式 = 周 + 全周期）
     const sel = document.getElementById('week-select');
-    sel.innerHTML = '<option value="ALL">全周期（' + D.weeks.length + ' 周）</option>' +
-      D.weeks.map(w => '<option value="' + w + '">周：' + w + '</option>').join('');
+    if (D.period) {
+      sel.innerHTML = '<option value="ALL">' + D.period.from + ' 至今 · 全周期合并（' +
+        fmtNum(model.kpi.creators) + ' 位达人）</option>';
+    } else {
+      sel.innerHTML = '<option value="ALL">全周期（' + D.weeks.length + ' 周）</option>' +
+        D.weeks.map(w => '<option value="' + w + '">周：' + w + '</option>').join('');
+    }
     sel.value = 'ALL';
     sel.addEventListener('change', () => {
       model = computeAll(D, sel.value);
       tableState.tier = 'ALL'; tableState.q = '';
       renderAll();
     });
-    model = computeAll(D, 'ALL');
     renderAll();
 
     // delegated events

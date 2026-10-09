@@ -169,14 +169,26 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:44px 0}
     <h1>TikTok 达人 ROI 运营看板</h1>
     <p class="sub">面向 TikTok Shop 纯佣达人（宠物垂类）的周度运营看板。一套数据模型、四个业务模块、一条「数据更新 → 看板刷新 → 周报输出」的自动化链路。</p>
     <div class="meta-row">
-      <span class="chip"><b>数据源</b> ss.xlsx · TikTok Shop Affiliate 报表</span>
-      <span class="chip"><b>样本</b> 1,068 位达人快照</span>
+      <span class="chip"><b>数据源</b> 6 份 TikTok Shop Affiliate 导出（去重合并）</span>
+      <span class="chip"><b>样本</b> 1,646 位达人 · 2026-04-11 至今全周期</span>
       <span class="chip"><b>业务模式</b> 纯佣（无坑位费）</span>
-      <span class="chip"><b>交付形态</b> Tableau Dashboard × 3 Tab</span>
-      <span class="chip"><b>更新节奏</b> 周度追加 + 一键刷新</span>
+      <span class="chip"><b>交付形态</b> Tableau Dashboard × 3 Tab（附在线交互版）</span>
+      <span class="chip"><b>更新节奏</b> 全周期合并 + 一键刷新</span>
     </div>
   </div>
 </header>
+
+<div style="background:#FDF3E3;border-bottom:1px solid #F0DFC2;padding:14px 0">
+  <div class="wrap" style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:#7A5310;line-height:1.6">
+    <span style="font-size:16px">⚠️</span>
+    <div><b style="color:#B45309">2026-10-09 数据口径更新</b>：原始输入已从单份快照（ss.xlsx，1,068 位达人 / GMV $375）扩展为
+      <b>6 份相互重叠的导出合并</b>（2026-04-11 至今全周期，1,646 位达人 / GMV $1,762.62 / 退款率 30.1% / 纯佣 ROI 11.38x · 全成本 0.41x）。
+      合并采用「按达人去重 + 窗口值取最大观测 + 退款金额去重求和」，规则与冲突明细见
+      <code style="font-size:12px">data/merged/merge_log.txt</code> 与仓库 <code style="font-size:12px">README.md</code>。
+      本说明书下文的「周度区间导出 + 通配符并集」仍是 Tableau 落地的有效路径之一；若导出为相互重叠的窗口（如本例），
+      请先按上述规则去重合并再接入，否则会重复计数。</div>
+  </div>
+</div>
 
 <nav class="toc">
   <div class="toc-inner">
