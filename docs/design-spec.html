@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok 达人 ROI 运营看板 · 设计与落地说明书</title>
+<style>
+:root{
+  --bg:#F5F5F7;
+  --surface:#FFFFFF;
+  --surface-2:#FAFAFA;
+  --line:#E8E8ED;
+  --line-soft:#F0F0F3;
+  --t1:#1D1D1F;
+  --t2:#6E6E73;
+  --t3:#8E8E93;
+  --accent:#10A37F;
+  --accent-soft:#E8F5F1;
+  --blue:#0071E3;
+  --blue-soft:#EAF2FD;
+  --amber:#B45309;
+  --amber-soft:#FDF3E3;
+  --red:#C0392B;
+  --red-soft:#FCEDEB;
+  --radius:18px;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--t1);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue","PingFang SC","Microsoft YaHei",Inter,sans-serif;
+  font-size:15px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:-0.01em;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px 120px}
+
+.hero{background:var(--surface);border-bottom:1px solid var(--line);padding:76px 0 60px;margin-bottom:44px}
+.hero .wrap{padding-bottom:0}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+h1{font-size:46px;line-height:1.12;font-weight:640;letter-spacing:-0.03em;margin-bottom:16px}
+.sub{font-size:19px;color:var(--t2);max-width:760px;line-height:1.5;font-weight:400}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:32px}
+.chip{background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--t2)}
+.chip b{color:var(--t1);font-weight:560}
+
+.toc{position:sticky;top:0;z-index:50;background:rgba(245,245,247,.82);
+  backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--line);margin-bottom:44px}
+.toc-inner{max-width:1180px;margin:0 auto;padding:11px 32px;display:flex;gap:4px;overflow-x:auto}
+.toc a{color:var(--t2);text-decoration:none;font-size:13px;padding:5px 11px;border-radius:8px;white-space:nowrap;transition:.18s}
+.toc a:hover{background:var(--surface);color:var(--t1)}
+
+section{margin-bottom:76px;scroll-margin-top:60px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.08em;display:block;margin-bottom:10px}
+h2{font-size:31px;font-weight:620;letter-spacing:-0.025em;line-height:1.2;margin-bottom:12px}
+h3{font-size:19px;font-weight:600;letter-spacing:-0.015em;margin:36px 0 14px}
+h4{font-size:15px;font-weight:600;margin:22px 0 10px}
+.lede{font-size:16px;color:var(--t2);max-width:860px;line-height:1.6;margin-bottom:26px}
+p{color:var(--t1);margin-bottom:14px;max-width:900px}
+ul,ol{margin:0 0 16px 20px;max-width:900px}
+li{margin-bottom:7px;line-height:1.62}
+li::marker{color:var(--t3)}
+strong{font-weight:600}
+code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:5px;padding:1.5px 6px;color:#0B5F4A;white-space:nowrap}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;margin-bottom:18px}
+.card-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.card-sub{font-size:13.5px;color:var(--t2);margin-bottom:14px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:900px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.kpi .lab{font-size:12px;color:var(--t3);font-weight:500;margin-bottom:7px}
+.kpi .val{font-size:27px;font-weight:620;letter-spacing:-0.03em;line-height:1.1}
+.kpi .dlt{font-size:12px;margin-top:6px;color:var(--t2)}
+.kpi.acc{border-color:rgba(16,163,127,.32);background:linear-gradient(180deg,var(--accent-soft) 0%,#fff 62%)}
+.kpi.warn{border-color:rgba(192,57,43,.28);background:linear-gradient(180deg,var(--red-soft) 0%,#fff 62%)}
+.kpi.amb{border-color:rgba(180,83,9,.26);background:linear-gradient(180deg,var(--amber-soft) 0%,#fff 62%)}
+.up{color:#137A4E;font-weight:600}
+.down{color:var(--red);font-weight:600}
+
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);margin-bottom:18px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{background:var(--surface-2);text-align:left;font-weight:600;color:var(--t1);padding:11px 15px;
+  border-bottom:1px solid var(--line);white-space:nowrap;font-size:12.5px}
+td{padding:11px 15px;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.55}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#FCFCFD}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:12.5px}
+.tag{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:6px;font-weight:560;white-space:nowrap}
+.t-out{background:var(--accent-soft);color:#0B6B52}
+.t-cost{background:var(--red-soft);color:#9C2F24}
+.t-cnt{background:var(--blue-soft);color:#0A5BB5}
+.t-fun{background:#F2EDFB;color:#5B3BA8}
+.t-qua{background:var(--amber-soft);color:var(--amber)}
+
+pre{background:#1C1C1E;border:1px solid #2C2C2E;border-radius:12px;padding:16px 18px;overflow-x:auto;
+  margin:12px 0 18px;font-family:var(--mono);font-size:12.5px;line-height:1.72;color:#E8E8ED}
+pre .cm{color:#7A7A7E;font-style:italic}
+pre .kw{color:#7EE2C0}
+pre .fn{color:#8FC7FF}
+pre .st{color:#FFD48A}
+pre .nu{color:#C7B8FF}
+.copy-note{font-size:12px;color:var(--t3);margin:-12px 0 20px}
+
+.note{border-left:3px solid var(--accent);background:var(--surface);border-radius:0 12px 12px 0;
+  padding:14px 18px;margin:0 0 18px;font-size:14px;border-top:1px solid var(--line);
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);max-width:900px}
+.note.warn{border-left-color:var(--red)}
+.note.amb{border-left-color:var(--amber)}
+.note .nt{font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;display:block}
+.note.warn .nt{color:var(--red)}
+.note.amb .nt{color:var(--amber)}
+
+.wire{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin:18px 0 8px}
+.wire-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:0 4px}
+.wire-bar .wt{font-size:13.5px;font-weight:600}
+.wire-bar .ws{font-size:11.5px;color:var(--t3);font-family:var(--mono)}
+.wire-grid{display:grid;gap:10px}
+.wire-body{border:1px solid var(--line);border-radius:10px;background:var(--surface-2);
+  display:flex;flex-direction:column;overflow:hidden;min-height:60px}
+.wire-body .wb-h{font-size:11px;font-weight:600;color:var(--t2);padding:7px 10px;
+  border-bottom:1px solid var(--line);background:var(--surface)}
+.wire-body .wb-c{flex:1;padding:10px;font-size:11px;color:var(--t3);line-height:1.5}
+.wire-body.hl{border-color:rgba(16,163,127,.4);background:#fff}
+.wire-body.hl .wb-h{color:#0B6B52;background:var(--accent-soft)}
+.wire-cap{font-size:12.5px;color:var(--t3);margin:8px 0 22px;padding-left:4px}
+
+.mbar{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.mbar .mn{width:74px;font-size:10px;color:var(--t3);text-align:right;flex-shrink:0}
+.mbar .mt{flex:1;height:9px;background:#EFEFF2;border-radius:3px;overflow:hidden}
+.mbar .mf{height:100%;background:var(--accent);border-radius:3px;display:block}
+.mbar .mv{width:52px;font-size:10px;color:var(--t3);font-family:var(--mono);flex-shrink:0}
+
+.spark{display:flex;align-items:flex-end;gap:3px;height:26px;padding:0 2px}
+.spark i{flex:1;background:var(--accent);border-radius:2px 2px 0 0;opacity:.85;display:block}
+.spark i.q{background:#D9E2E9}
+
+.funnel-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.funnel-row .fl{width:52px;font-size:10px;color:var(--t3);flex-shrink:0}
+.funnel-row .fb{flex:1;height:16px;background:#EFEFF2;border-radius:4px;overflow:hidden}
+.funnel-row .ff{height:100%;background:var(--accent);border-radius:4px;opacity:.82;display:block}
+.funnel-row .fv{width:76px;font-size:10px;color:var(--t2);font-family:var(--mono);flex-shrink:0}
+
+.donut-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.donut-row .dl{width:16px;height:16px;border-radius:4px;flex-shrink:0}
+.donut-row .dn{flex:1;font-size:10.5px;color:var(--t2)}
+.donut-row .dv{font-size:10.5px;color:var(--t1);font-family:var(--mono);font-weight:600}
+
+.layer{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+.layer:last-child{border-bottom:none}
+
+.footer{border-top:1px solid var(--line);padding-top:26px;margin-top:60px;font-size:13px;color:var(--t3)}
+hr.sep{border:none;border-top:1px solid var(--line);margin:44px 0}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Tableau Dashboard Design Spec · v1.0</div>
+    <h1>TikTok 达人 ROI 运营看板</h1>
+    <p class="sub">面向 TikTok Shop 纯佣达人（宠物垂类）的周度运营看板。一套数据模型、四个业务模块、一条「数据更新 → 看板刷新 → 周报输出」的自动化链路。</p>
+    <div class="meta-row">
+      <span class="chip"><b>数据源</b> ss.xlsx · TikTok Shop Affiliate 报表</span>
+      <span class="chip"><b>样本</b> 1,068 位达人快照</span>
+      <span class="chip"><b>业务模式</b> 纯佣（无坑位费）</span>
+      <span class="chip"><b>交付形态</b> Tableau Dashboard × 3 Tab</span>
+      <span class="chip"><b>更新节奏</b> 周度追加 + 一键刷新</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#s0">00 数据体检</a>
+    <a href="#s1">01 数据地基</a>
+    <a href="#s2">02 指标字典</a>
+    <a href="#s3">03 模块一 核心概览</a>
+    <a href="#s4">04 模块二 分层诊断</a>
+    <a href="#s5">05 模块三 ROI 拆解</a>
+    <a href="#s6">06 模块四 策略追踪</a>
+    <a href="#s7">07 视觉规范</a>
+    <a href="#s8">08 周报 SOP</a>
+    <a href="#s9">09 落地排期</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ============ 00 ============ -->
+<section id="s0">
+  <span class="sec-num">00 / DATA AUDIT</span>
+  <h2>先看数，再设计</h2>
+  <p class="lede">我没有直接套模板。设计看板之前，先把手上这份 <code>ss.xlsx</code> 跑了一遍体检——因为<strong>看板要回答什么问题，取决于数据里藏着什么问题</strong>。三个体检结论，直接决定了后面四个模块的设计重点。</p>
+
+  <div class="grid4" style="margin-bottom:22px">
+    <div class="kpi"><div class="lab">达人池</div><div class="val">1,068</div><div class="dlt">已进入数据池</div></div>
+    <div class="kpi warn"><div class="lab">出单达人</div><div class="val">8</div><div class="dlt"><span class="down">激活率 0.7%</span></div></div>
+    <div class="kpi acc"><div class="lab">Creator GMV</div><div class="val">$375</div><div class="dlt">佣金 $34.12</div></div>
+    <div class="kpi amb"><div class="lab">寄样总量</div><div class="val">389</div><div class="dlt">件样品已发出</div></div>
+  </div>
+
+  <h3>体检结论一：纯佣 ROI 很好看，但它是「假健康」</h3>
+  <p>表面口径 ROI = GMV ÷ 佣金 = <strong>10.99x</strong>。但这个 10.99 只把平台佣金算作成本，而纯佣模式的真实成本还有一个大头——<strong>免费寄出去的样品</strong>。把样品按保守的 $5 / 件（货值 + 头程物流）计入后：</p>
+
+  <div class="grid3">
+    <div class="kpi"><div class="lab">纯佣现金 ROI</div><div class="val" style="color:var(--accent)">10.99x</div><div class="dlt">仅计平台佣金</div></div>
+    <div class="kpi amb"><div class="lab">全成本 ROI（样品 $3/件）</div><div class="val" style="color:var(--amber)">0.31x</div><div class="dlt">佣金 + $1,167 样品</div></div>
+    <div class="kpi warn"><div class="lab">全成本 ROI（样品 $5/件）</div><div class="val" style="color:var(--red)">0.19x</div><div class="dlt">佣金 + $1,945 样品</div></div>
+  </div>
+
+  <div class="note warn">
+    <span class="nt">设计含义</span>
+    <strong>看板必须双口径呈现 ROI。</strong>只报 10.99x 是「数字好看但没用」；只看 0.19x 又会误判模式不成立。真正要管的，是这两条曲线的<strong>收敛速度</strong>——随着样品投放精度提升，全成本 ROI 逐步向纯佣 ROI 逼近。这条收敛线是整个看板最重要的策略叙事，也是模块一设计一个「双 ROI 对比卡」的原因。
+  </div>
+
+  <h3>体检结论二：99% 的样品，投给了 0 产出的人</h3>
+  <p>把 1,068 位达人按「漏斗状态 + 产出」切成七层后，资源错配暴露得非常彻底：</p>
+
+  <div class="wire" style="margin-top:14px">
+    <div class="wire-bar"><span class="wt">样品投放分布（当前快照）</span><span class="ws">389 samples / $375 GMV</span></div>
+    <div style="padding:8px 4px 4px">
+      <div class="funnel-row"><span class="fl">A+B 产出层</span><span class="fb"><span class="ff" style="width:1%"></span></span><span class="fv">4 件 · 1.0%</span></div>
+      <div class="funnel-row"><span class="fl">C 有内容未转化</span><span class="fb"><span class="ff" style="width:57.1%"></span></span><span class="fv">222 件 · 57.1%</span></div>
+      <div class="funnel-row"><span class="fl">E 寄样未铺货</span><span class="fb"><span class="ff" style="width:41.9%"></span></span><span class="fv">163 件 · 41.9%</span></div>
+      <div class="funnel-row"><span class="fl">F 仅邀约</span><span class="fb"><span class="ff" style="width:0%"></span></span><span class="fv">0 件 · 0%</span></div>
+    </div>
+  </div>
+  <p class="wire-cap">真正带来 GMV 的 8 位达人只吃掉 4 件样品；而 C、E 两层合计 419 人吃掉 385 件（99.0%），产出 $0。这不是 ROI 问题，是<strong>投放精度</strong>问题。</p>
+
+  <div class="note">
+    <span class="nt">设计含义</span>
+    纯佣 BD 的核心资源不是钱，是<strong>时间 + 样品</strong>。所以模块二的分层不能只按 GMV 排名——那样只有 8 个人有数，其余 99.3% 全是 0，图表会整体空掉。必须按<strong>漏斗状态</strong>分层，这样每一层都有人、都有明确的下一步动作。这是这套看板区别于通用 GMV 报表的关键设计决策。
+  </div>
+
+  <h3>体检结论三：GMV 可以完整拆解，指标链条自洽</h3>
+  <p>源表里的四个字段构成一条完整乘法链。我用 8 位出单达人的真实数据做了反算验证：</p>
+
+  <div style="background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0 18px;text-align:center">
+    <div style="font-family:var(--mono);font-size:14.5px">
+      GMV = Product Impressions × <span style="color:var(--blue)">CTR</span> × <span style="color:var(--accent)">CTOR</span> × <span style="color:var(--amber)">AOV</span>
+    </div>
+    <div style="font-size:12.5px;color:var(--t3);margin-top:8px">曝光 → 点击 → 下单 → 客单价　｜　8 位达人逐条验证，<strong style="color:var(--accent)">平均相对误差 0.3%</strong></div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Creator</th><th class="num">Impressions</th><th class="num">CTR</th><th class="num">CTOR</th><th class="num">AOV</th><th class="num">实际 GMV</th><th class="num">公式推算</th></tr></thead>
+      <tbody>
+        <tr><td>jasmina__marie</td><td class="num">518</td><td class="num">0.97%</td><td class="num">20.00%</td><td class="num">$135.99</td><td class="num">$135.99</td><td class="num">$136.66</td></tr>
+        <tr><td>tabbyandtuxedocat</td><td class="num">5,027</td><td class="num">1.87%</td><td class="num">2.13%</td><td class="num">$53.12</td><td class="num">$106.24</td><td class="num">$106.36</td></tr>
+        <tr><td>littlelifethings_16</td><td class="num">8,758</td><td class="num">1.88%</td><td class="num">0.61%</td><td class="num">$49.99</td><td class="num">$49.99</td><td class="num">$50.21</td></tr>
+        <tr><td>kdsartistry.org</td><td class="num">436</td><td class="num">0.46%</td><td class="num">50.00%</td><td class="num">$12.83</td><td class="num">$12.83</td><td class="num">$12.87</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="nt">设计含义</span>
+    这条链验证通过，意味着模块三的 ROI 拆解可以做<strong>瀑布图精确归因</strong>而不是拍脑袋归因——本周 GMV 变动了多少，能拆成「曝光 / CTR / CTOR / AOV」各贡献多少美元。这是看板里最能体现分析深度的一张图。
+  </div>
+
+  <hr class="sep">
+  <h3>顺带看了一眼：同目录下还有可用素材</h3>
+  <p><code>members-export-*.csv</code>（19,922 行）里有 <code>TikTok Handle</code> + <code>Platform L30D GMV</code>，可作为「达人历史带货能力」的补充维度。当前与 ss.xlsx 的匹配度只有 1.7%（330 人），但作为<strong>未来建联前的预判字段</strong>很有价值，建议在数据模型里预留位置。</p>
+</section>
+
+<!-- ============ 01 ============ -->
+<section id="s1">
+  <span class="sec-num">01 / DATA FOUNDATION</span>
+  <h2>数据地基：从 ss.xlsx 到可刷新的 Tableau 模型</h2>
+  <p class="lede">这一节决定「能不能一键刷新」。四个必须提前解决的结构性问题，不解决的话后面所有图表都做不出来，或者每周要手工返工。</p>
+
+  <h3>问题清单</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:20%">问题</th><th style="width:34%">现状</th><th>解决方案（必须项）</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>没有时间字段</strong></td>
+          <td>23 个字段全是当期快照，<code>ss.xlsx</code> 里看不到任何日期</td>
+          <td>每次导出后补 <code>snapshot_week</code>（该周周一，用作周 ID）+ <code>snapshot_date</code>。没有这一列，环比 / 趋势 / 周筛选全部无从谈起</td>
+        </tr>
+        <tr>
+          <td><strong>快照 vs 增量的口径陷阱</strong></td>
+          <td>TikTok 后台可按周期筛选导出。若每周导「全周期累计」，两份快照相减<strong>得不到</strong>周增量——退款跨期错配，历史数据还会被后台回溯修正</td>
+          <td><strong>统一按周区间导出</strong>：每周导出时后台选「自定义 = 上周一～周日」，导出的就是周增量事实表。全周期 = Tableau 里 SUM 所有周，口径天然一致</td>
+        </tr>
+        <tr>
+          <td><strong>金额 / 百分比是文本</strong></td>
+          <td><code>$135.99</code>、<code>0.97%</code>、<code>20%</code> 混在同一列，Tableau 会识别成字符串</td>
+          <td>见下方「Tableau 内清洗」计算字段；或更推荐在 Excel / Prep 阶段先转数值（性能更好）</td>
+        </tr>
+        <tr>
+          <td><strong>缺达人属性维度</strong></td>
+          <td>只有 handle，没有粉丝量 / 类目 / 地区 / 归属 BD，无法做维度下钻</td>
+          <td>自建 <code>D_Creator</code> 维表手工维护，字段按需扩展（见下方模型图）</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>星型数据模型</h3>
+  <div class="wire">
+    <div class="wire-bar"><span class="wt">Tableau 数据模型（逻辑层 Relationships）</span><span class="ws">1 Fact + 3 Dim</span></div>
+    <div style="padding:22px 12px 16px;font-family:var(--mono);font-size:12px">
+      <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;align-items:stretch">
+        <div style="border:1.5px solid var(--accent);border-radius:12px;padding:12px 16px;background:var(--accent-soft);min-width:200px">
+          <div style="font-weight:700;color:#0B6B52;margin-bottom:5px">F_Creator_Week</div>
+          <div style="color:var(--t2);font-size:11px;line-height:1.7">creator_key *(PK)<br>week_start *(FK)<br>snapshot_date<br>─────────<br>gmv / gmv_live / gmv_video<br>refunds / orders / units<br>aov / card_gmv<br>impressions / video_views<br>ctr / ctor<br>videos / live_streams<br>samples_shipped / added_to_showcase<br>commission / flat_fee<br>sample_cost</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;justify-content:center;font-size:11px;color:var(--t3)">
+          <div>── n:1 ──▶</div><div>── n:1 ──▶</div><div>── n:1 ──▶</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;min-width:186px">
+          <div style="border:1.5px solid var(--blue);border-radius:12px;padding:10px 14px;background:var(--blue-soft)">
+            <div style="font-weight:700;color:#0A5BB5;margin-bottom:4px">D_Creator</div>
+            <div style="color:var(--t2);font-size:11px;line-height:1.65">creator_key / handle<br>tier / category / region<br>owner_bd / first_contact_week<br>platform_l30d_gmv（预留）</div>
+          </div>
+          <div style="border:1.5px solid #8B6BD6;border-radius:12px;padding:10px 14px;background:#F2EDFB">
+            <div style="font-weight:700;color:#5B3BA8;margin-bottom:4px">D_Date</div>
+            <div style="color:var(--t2);font-size:11px;line-height:1.65">week_start / week_id<br>iso_year_week / month<br>is_current_week<br>is_latest_4_weeks</div>
+          </div>
+          <div style="border:1.5px solid #C2922E;border-radius:12px;padding:10px 14px;background:var(--amber-soft)">
+            <div style="font-weight:700;color:var(--amber);margin-bottom:4px">D_Intervention</div>
+            <div style="color:var(--t2);font-size:11px;line-height:1.65">creator_key<br>intervention_type<br>intervention_week<br>after_flag（前 / 后）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="wire-cap"><code>D_Intervention</code> 是模块四「策略效果追踪」的专用维表，用来做 Before / After 对照。这张表通常没人做，但它决定了优化动作到底能不能被验证。</p>
+
+  <h3>落地方案：通配符并集 = 一键刷新</h3>
+  <div class="note">
+    <span class="nt">核心机制</span>
+    不要每次手动改数据源，用 <strong>Tableau 通配符并集（Wildcard Union）</strong>。把所有周度 CSV 丢进同一个文件夹，统一命名为 <code>YYYYMMDD_creator_weekly.csv</code>。Tableau 连接时用通配符 <code>*_creator_weekly.csv</code>，之后每周只要把新文件丢进文件夹 → 数据源点「刷新」 → <strong>全看板连同所有模块自动更新</strong>，零改表、零改公式。
+  </div>
+
+  <h4>文件夹结构</h4>
+  <pre><span class="cm">/tiktok-affiliate-dashboard</span>
+  <span class="cm">├── data/</span>
+  <span class="cm">│   ├── weeks/</span>
+  <span class="cm">│   │   ├── 20260922_creator_weekly.csv</span>
+  <span class="cm">│   │   ├── 20260929_creator_weekly.csv</span>
+  <span class="cm">│   │   └── 20261006_creator_weekly.csv   ← 本周新丢进来</span>
+  <span class="cm">│   ├── D_Creator.csv                     ← 维表，手工维护</span>
+  <span class="cm">│   ├── D_Date.csv                        ← 一次性生成 52×N 周</span>
+  <span class="cm">│   └── D_Intervention.csv                ← 策略动作台账</span>
+  <span class="cm">├── prepare.py                           ← 可选：自动加列 + 清洗</span>
+  <span class="cm">└── dashboard_v1.twb</span></pre>
+
+  <h4>清洗脚本（推荐用它替掉手工加列）</h4>
+  <pre><span class="cm"># prepare.py —— 每周跑一次：python prepare.py raw_export.xlsx 2026-10-06</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd, sys, datetime <span class="kw">as</span> dt
+
+df = pd.<span class="fn">read_excel</span>(sys.argv[<span class="nu">1</span>], header=<span class="nu">0</span>, skiprows=[<span class="nu">1</span>])  <span class="cm"># 第2行是字段说明，跳过</span>
+week_start = pd.<span class="fn">Timestamp</span>(sys.argv[<span class="nu">2</span>])                       <span class="cm"># 该周周一</span>
+
+money = [<span class="st">'Creator-attributed GMV'</span>, <span class="st">'Refunds'</span>, <span class="st">'AOV'</span>, <span class="st">'Est. commission'</span>,
+         <span class="st">'Creator LIVE-attributed GMV'</span>, <span class="st">'Creator video-attributed GMV'</span>, <span class="st">'Est. flat fee'</span>]
+pct = [<span class="st">'CTOR'</span>, <span class="st">'CTR'</span>]
+
+<span class="kw">for</span> c <span class="kw">in</span> money:
+    df[c] = df[c].<span class="fn">astype</span>(str).<span class="fn">str</span>.<span class="fn">replace</span>(<span class="st">r'[$,]'</span>, <span class="st">''</span>, regex=<span class="kw">True</span>).<span class="fn">replace</span>(<span class="st">''</span>, <span class="st">'0'</span>).<span class="fn">astype</span>(float)
+<span class="kw">for</span> c <span class="kw">in</span> pct:
+    df[c] = df[c].<span class="fn">astype</span>(str).<span class="fn">str</span>.<span class="fn">replace</span>(<span class="st">'%'</span>, <span class="st">''</span>).<span class="fn">replace</span>(<span class="st">''</span>, <span class="st">'0'</span>).<span class="fn">astype</span>(float) / <span class="nu">100</span>
+
+<span class="cm"># 时间维度——没有这三列，环比 / 趋势全部作废</span>
+df[<span class="st">'snapshot_date'</span>] = pd.<span class="fn">Timestamp</span>(dt.date.<span class="fn">today</span>())
+df[<span class="st">'week_start'</span>]    = week_start
+df[<span class="st">'week_id'</span>]       = week_start.<span class="fn">strftime</span>(<span class="st">'%Y-W%V'</span>)
+
+<span class="cm"># 样品货值：改成你们真实的单件货值 + 运费</span>
+df[<span class="st">'sample_cost'</span>]    = df[<span class="st">'Samples shipped'</span>] * <span class="nu">5.0</span>
+df[<span class="st">'creator_key'</span>]   = df[<span class="st">'Creator name'</span>].<span class="fn">str</span>.<span class="fn">strip</span>().<span class="fn">str</span>.<span class="fn">lower</span>()
+
+out = <span class="st">f'data/weeks/{week_start.strftime("%Y%m%d")}_creator_weekly.csv'</span>
+df.<span class="fn">to_csv</span>(out, index=<span class="kw">False</span>)
+<span class="fn">print</span>(<span class="st">'written:'</span>, out, df.shape)</pre>
+  <p class="copy-note"><code>sample_cost</code> 是全盘最关键的人为设定值——它把「看不见的样品成本」变成可量化分子。建议先和主管对齐单价口径后再定稿。</p>
+
+  <h4>Tableau 内清洗（不想用脚本时）</h4>
+  <pre><span class="cm">// 文本金额 / 百分比 → 数值</span>
+[GMV (num)]        = <span class="fn">FLOAT</span>(<span class="fn">REPLACE</span>(<span class="fn">REPLACE</span>([Creator-attributed GMV], <span class="st">'$'</span>, <span class="st">''</span>), <span class="st">','</span>, <span class="st">''</span>))
+[Commission (num)] = <span class="fn">FLOAT</span>(<span class="fn">REPLACE</span>(<span class="fn">REPLACE</span>([Est. commission],        <span class="st">'$'</span>, <span class="st">''</span>), <span class="st">','</span>, <span class="st">''</span>))
+[Refunds (num)]    = <span class="fn">FLOAT</span>(<span class="fn">REPLACE</span>(<span class="fn">REPLACE</span>([Refunds],                 <span class="st">'$'</span>, <span class="st">''</span>), <span class="st">','</span>, <span class="st">''</span>))
+[AOV (num)]        = <span class="fn">FLOAT</span>(<span class="fn">REPLACE</span>(<span class="fn">REPLACE</span>([AOV],                     <span class="st">'$'</span>, <span class="st">''</span>), <span class="st">','</span>, <span class="st">''</span>))
+[CTR (rate)]       = <span class="fn">FLOAT</span>(<span class="fn">REPLACE</span>([CTR],  <span class="st">'%'</span>, <span class="st">''</span>)) / <span class="nu">100</span>
+[CTOR (rate)]      = <span class="fn">FLOAT</span>(<span class="fn">REPLACE</span>([CTOR], <span class="st">'%'</span>, <span class="st">''</span>)) / <span class="nu">100</span></pre>
+</section>
+
+<!-- ============ 02 ============ -->
+<section id="s2">
+  <span class="sec-num">02 / METRIC DICTIONARY</span>
+  <h2>指标字典与 Tableau 计算字段</h2>
+  <p class="lede">所有模块共用同一套计算字段，集中定义一次，避免各图各算一套导致周报里数字打架。以下公式可直接复制进 Tableau 计算字段编辑器。</p>
+
+  <h3>A. 基础度量</h3>
+  <pre><span class="cm">// —— 产出侧 ——</span>
+[Net GMV]           = <span class="fn">SUM</span>([GMV (num)]) - <span class="fn">SUM</span>([Refunds (num)])
+[Content Count]     = <span class="fn">SUM</span>([Videos]) + <span class="fn">SUM</span>([LIVE streams])
+[Attributed Orders] = <span class="fn">SUM</span>([Attributed orders])
+
+<span class="cm">// —— 成本侧（纯佣模式的关键：成本 ≠ 只有佣金）——</span>
+[Cash Cost]  = <span class="fn">SUM</span>([Commission (num)])
+[Total Cost] = <span class="fn">SUM</span>([Commission (num)]) + <span class="fn">SUM</span>([sample_cost])
+
+<span class="cm">// —— 双口径 ROI ——</span>
+[ROI (Cash)]      = <span class="fn">SUM</span>([GMV (num)]) / <span class="fn">NULLIF</span>([Cash Cost],  <span class="nu">0</span>)
+[ROI (Full Cost)] = <span class="fn">SUM</span>([GMV (num)]) / <span class="fn">NULLIF</span>([Total Cost], <span class="nu">0</span>)</pre>
+
+  <h3>B. 效率与质量指标</h3>
+  <pre>[Commission Rate] = <span class="fn">SUM</span>([Commission (num)]) / <span class="fn">NULLIF</span>(<span class="fn">SUM</span>([GMV (num)]), <span class="nu">0</span>)
+[Refund Rate]     = <span class="fn">SUM</span>([Refunds (num)])    / <span class="fn">NULLIF</span>(<span class="fn">SUM</span>([GMV (num)]), <span class="nu">0</span>)
+[AOV (Blended)]   = <span class="fn">SUM</span>([GMV (num)])        / <span class="fn">NULLIF</span>([Attributed Orders], <span class="nu">0</span>)
+
+<span class="cm">// 资源效率：纯佣 BD 真正要管的三个"分母"</span>
+[GMV per Sample]  = <span class="fn">SUM</span>([GMV (num)]) / <span class="fn">NULLIF</span>(<span class="fn">SUM</span>([Samples shipped]), <span class="nu">0</span>)
+[GMV per Content] = <span class="fn">SUM</span>([GMV (num)]) / <span class="fn">NULLIF</span>([Content Count], <span class="nu">0</span>)
+[GPM]             = <span class="fn">SUM</span>([GMV (num)]) / <span class="fn">NULLIF</span>(<span class="fn">SUM</span>([Video views]), <span class="nu">0</span>) * <span class="nu">1000</span>
+
+<span class="cm">// 漏斗效率</span>
+[Active Creators]  = <span class="fn">COUNTD</span>(<span class="kw">IF</span> {FIXED [creator_key] : <span class="fn">SUM</span>([GMV (num)])} &gt; <span class="nu">0</span> <span class="kw">THEN</span> [creator_key] <span class="kw">END</span>)
+[Activation Rate]  = [Active Creators] / <span class="fn">NULLIF</span>(<span class="fn">COUNTD</span>([creator_key]), <span class="nu">0</span>)
+[Breakout Rate]    = [Active Creators] / <span class="fn">NULLIF</span>(<span class="fn">COUNTD</span>(<span class="kw">IF</span> <span class="fn">SUM</span>([Samples shipped]) &gt; <span class="nu">0</span> <span class="kw">THEN</span> [creator_key] <span class="kw">END</span>), <span class="nu">0</span>)</pre>
+
+  <h3>C. 周环比（不受筛选器影响的参数化写法）</h3>
+  <div class="note amb">
+    <span class="nt">为什么不用表计算</span>
+    「<code>LOOKUP(SUM([GMV]), -1)</code>」写起来最快，但<strong>一旦加了周筛选器，表计算就断</strong>——筛出单周之后它看不见上一周。要在同一个工作表里同时呈现「本周 / 上周 / 全周期」三组数字，必须用<strong>日期参数 + FIXED LOD</strong>。
+  </div>
+
+  <pre><span class="cm">// Step 1：建参数 [p_Week]，类型 = 日期，可用值来自 [week_start]</span>
+
+<span class="cm">// Step 2：三个口径的 GMV（同理可做 Commission / ROI / Active Creators）</span>
+[GMV · Selected] = {FIXED : <span class="fn">SUM</span>(<span class="kw">IF</span> [week_start] = [p_Week] <span class="kw">THEN</span> [GMV (num)] <span class="kw">END</span>)}
+[GMV · Prev Wk]  = {FIXED : <span class="fn">SUM</span>(<span class="kw">IF</span> [week_start] = <span class="fn">DATEADD</span>(<span class="st">'week'</span>, -<span class="nu">1</span>, [p_Week]) <span class="kw">THEN</span> [GMV (num)] <span class="kw">END</span>)}
+[GMV · All Time] = {FIXED : <span class="fn">SUM</span>([GMV (num)])}
+
+<span class="cm">// Step 3：环比 + KPI 装饰</span>
+[WoW GMV %] = ([GMV · Selected] - [GMV · Prev Wk]) / <span class="fn">ABS</span>([GMV · Prev Wk])
+[KPI Arrow] = <span class="kw">IF</span> <span class="fn">ISNULL</span>([WoW GMV %])        <span class="kw">THEN</span> <span class="st">'—'</span>
+             <span class="kw">ELSEIF</span> [WoW GMV %] &gt;  <span class="nu">0.02</span> <span class="kw">THEN</span> <span class="st">'▲'</span>
+             <span class="kw">ELSEIF</span> [WoW GMV %] &lt; -<span class="nu">0.02</span> <span class="kw">THEN</span> <span class="st">'▼'</span>
+             <span class="kw">ELSE</span> <span class="st">'▬'</span> <span class="kw">END</span>
+[KPI Color] = <span class="kw">IF</span> [WoW GMV %] &gt;= <span class="nu">0</span> <span class="kw">THEN</span> <span class="st">'Positive'</span> <span class="kw">ELSE</span> <span class="st">'Negative'</span> <span class="kw">END</span></pre>
+  <p class="copy-note">把 <code>[KPI Color]</code> 拖到「颜色」，再在图例里把 Positive / Negative 分别改成规范里的绿 / 红，即可用一个字段统一控制所有 KPI 卡配色。</p>
+
+  <div class="note warn">
+    <span class="nt">LOD 与筛选器的坑</span>
+    FIXED LOD 在筛选器<strong>之前</strong>计算。如果看板上有「品类 / BD 负责人」这类筛选器，FIXED 会忽略它们，数字会看起来不对。解决办法：把需要参与总盘计算的筛选器<strong>右键 → 添加到上下文（Add to Context）</strong>。
+  </div>
+
+  <h3>D. 达人七层分层（LOD 主字段）</h3>
+  <pre>[Creator Tier] =
+<span class="kw">IF</span>     {FIXED [creator_key] : <span class="fn">SUM</span>([GMV (num)])} &gt;= <span class="nu">500</span> <span class="kw">THEN</span> <span class="st">'S · 头部产出'</span>
+<span class="kw">ELSEIF</span> {FIXED [creator_key] : <span class="fn">SUM</span>([GMV (num)])} &gt;= <span class="nu">100</span> <span class="kw">THEN</span> <span class="st">'A · 稳定产出'</span>
+<span class="kw">ELSEIF</span> {FIXED [creator_key] : <span class="fn">SUM</span>([GMV (num)])} &gt;   <span class="nu">0</span>  <span class="kw">THEN</span> <span class="st">'B · 已破零'</span>
+<span class="kw">ELSEIF</span> {FIXED [creator_key] : <span class="fn">SUM</span>([Videos]) + <span class="fn">SUM</span>([LIVE streams])} &gt; <span class="nu">0</span> <span class="kw">THEN</span> <span class="st">'C · 有内容未转化'</span>
+<span class="kw">ELSEIF</span> {FIXED [creator_key] : <span class="fn">SUM</span>([Products added to showcase])} &gt; <span class="nu">0</span> <span class="kw">THEN</span> <span class="st">'D · 铺货未产出'</span>
+<span class="kw">ELSEIF</span> {FIXED [creator_key] : <span class="fn">SUM</span>([Samples shipped])} &gt; <span class="nu">0</span> <span class="kw">THEN</span> <span class="st">'E · 寄样未铺货'</span>
+<span class="kw">ELSE</span> <span class="st">'F · 仅邀约·无动作'</span> <span class="kw">END</span></pre>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:15%">层级</th><th style="width:28%">判定条件</th><th class="num" style="width:11%">当前人数</th><th class="num" style="width:14%">当前 GMV</th><th>运营动作</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag t-out">S 头部</span></td><td>累计 GMV ≥ $500</td><td class="num">0</td><td class="num">—</td><td>锁库存 + 专属高佣 + 长期合约，防挖角</td></tr>
+        <tr><td><span class="tag t-out">A 稳定</span></td><td>累计 GMV $100–500</td><td class="num">2</td><td class="num">$242 · 64.5%</td><td>加码 SKU、提佣 2–3pt、推动开直播</td></tr>
+        <tr><td><span class="tag t-out">B 已破零</span></td><td>累计 GMV &gt; $0</td><td class="num">6</td><td class="num">$132 · 35.2%</td><td>复制其爆款脚本，追加同款 / 组合装</td></tr>
+        <tr><td><span class="tag t-qua">C 有内容未转化</span></td><td>发过视频/直播，GMV = 0</td><td class="num">263</td><td class="num">$0</td><td><strong>最高优先级</strong>：诊断 CTR / CTOR 哪环断，优化挂车位与口播</td></tr>
+        <tr><td><span class="tag t-fun">D 铺货未产出</span></td><td>加了橱窗，未发内容</td><td class="num">0</td><td class="num">$0</td><td>催更 + 发拍摄脚本模板</td></tr>
+        <tr><td><span class="tag t-fun">E 寄样未铺货</span></td><td>样品已到，未上架</td><td class="num">156</td><td class="num">$0</td><td><strong>止损区</strong>：二次触达，超 3 周无动作停止寄样</td></tr>
+        <tr><td><span class="tag" style="background:#F1F1F4;color:#6E6E73">F 仅邀约</span></td><td>全部为 0</td><td class="num">641</td><td class="num">$0</td><td>批量二次触达，或直接清出池子</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>E. 周报自动文案（动态标题）</h3>
+  <p>整套方案里最能体现「效率意识」的一处——让 Tableau 自动生成周报第一句话，每周省掉手写时间，且数字不会有手误。</p>
+  <pre>[Weekly Headline] =
+<span class="st">"本周 Creator GMV $"</span> + <span class="fn">STR</span>(<span class="fn">ROUND</span>([GMV · Selected], <span class="nu">0</span>)) +
+<span class="st">"，环比 "</span> + <span class="fn">STR</span>(<span class="fn">ROUND</span>([WoW GMV %]*<span class="nu">100</span>, <span class="nu">1</span>)) + <span class="st">"%；纯佣 ROI "</span> +
+<span class="fn">STR</span>(<span class="fn">ROUND</span>([ROI (Cash)], <span class="nu">2</span>)) + <span class="st">"x，全成本 ROI "</span> + <span class="fn">STR</span>(<span class="fn">ROUND</span>([ROI (Full Cost)], <span class="nu">2</span>)) +
+<span class="st">"x；出单达人 "</span> + <span class="fn">STR</span>([Active Creators]) + <span class="st">" 位，本周新增破零 "</span> +
+<span class="fn">STR</span>([New Breakouts]) + <span class="st">" 位。"</span></pre>
+</section>
+
+<!-- ============ 03 ============ -->
+<section id="s3">
+  <span class="sec-num">03 / MODULE 01</span>
+  <h2>模块一 · 核心指标概览</h2>
+  <p class="lede">放在看板最顶部。任务只有一个：<strong>让汇报对象 5 秒内知道这周好还是不好，以及钱花在哪</strong>。周报截图时，往往只需要这一屏。</p>
+
+  <h3>设计思路</h3>
+  <ol>
+    <li><strong>双 ROI 并列，主动暴露真实成本。</strong>左边「纯佣 ROI 10.99x」，紧挨着右边「全成本 ROI 0.19x」。不加掩饰——这在周报里反而加分，它说明你知道纯佣模式的隐性成本在哪，而不是只挑好看的数字报。</li>
+    <li><strong>KPI 卡自带环比 + 微趋势。</strong>每张卡 = 主数值 + 环比百分比 + 8 周 sparkline。环比用颜色和箭头标注方向，不用让人再去对比两张图。</li>
+    <li><strong>成本结构可视化。</strong>纯佣不等于零成本。用一条堆叠条把「佣金 vs 样品成本」的绝对金额摆出来，让所有人一眼看到样品才是大头。</li>
+    <li><strong>预留目标线。</strong>所有 KPI 支持参数目标值（<code>p_Target_GMV</code> / <code>p_Target_ROI</code>），配合子弹图判断达成率。</li>
+  </ol>
+
+  <h3>核心指标（8 个）</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:18%">指标</th><th style="width:32%">定义 / 计算字段</th><th style="width:15%">当前值</th><th>为什么放这里</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Creator GMV</strong></td><td><code>SUM([GMV (num)])</code></td><td class="num">$375.00</td><td>盘子总规模，周报第一个数字</td></tr>
+        <tr><td><strong>Net GMV</strong></td><td><code>GMV − Refunds</code></td><td class="num">$375.00</td><td>扣退款后的真实成交额</td></tr>
+        <tr><td><strong>纯佣 ROI</strong></td><td><code>[ROI (Cash)]</code></td><td class="num">10.99x</td><td>对外汇报口径（现金成本）</td></tr>
+        <tr><td><strong>全成本 ROI</strong></td><td><code>[ROI (Full Cost)]</code></td><td class="num">0.19x</td><td><strong>内部真实口径</strong>，含样品成本</td></tr>
+        <tr><td><strong>出单达人 / 激活率</strong></td><td><code>[Active Creators] / [Activation Rate]</code></td><td class="num">8 / 0.7%</td><td>当前阶段第一瓶颈，比 GMV 更值得盯</td></tr>
+        <tr><td><strong>佣金支出 / 佣金率</strong></td><td><code>[Cash Cost] / [Commission Rate]</code></td><td class="num">$34.12 / 9.1%</td><td>验证佣金率设置是否合理</td></tr>
+        <tr><td><strong>寄样数 / 单样品产出</strong></td><td><code>SUM([Samples shipped]) / [GMV per Sample]</code></td><td class="num">389 / $0.96</td><td>资源投放精度的核心温度计</td></tr>
+        <tr><td><strong>内容数 / GPM</strong></td><td><code>[Content Count] / [GPM]</code></td><td class="num">475 / $3.20</td><td>内容侧产出效率</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>推荐图表</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">① KPI 卡组 × 8</div>
+      <div class="card-sub">每张卡 = 数值 + 环比 + sparkline</div>
+      <ul style="font-size:13.5px;margin-left:16px">
+        <li>做法：8 个小工作表平铺（推荐，改样式最省事），或用一个工作表做「度量名称/值」分区</li>
+        <li>环比用 <code>[KPI Arrow]</code> + <code>[KPI Color]</code> 控制</li>
+        <li>sparkline：迷你折线图，坐标轴全部隐藏，只保留线</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">② GMV 与 ROI 双轴组合图</div>
+      <div class="card-sub">柱 = GMV（左轴），线 = ROI（右轴）</div>
+      <ul style="font-size:13.5px;margin-left:16px">
+        <li>X 轴 = <code>week_start</code>，覆盖全部历史周</li>
+        <li>两条 ROI 线同图对比，<strong>差距收窄</strong>即为改善信号</li>
+        <li>加参考线 = 参数 <code>p_Target_ROI</code>（建议先设 8x）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">③ 成本结构堆叠条</div>
+      <div class="card-sub">佣金 vs 样品成本（绝对金额）</div>
+      <ul style="font-size:13.5px;margin-left:16px">
+        <li>单条横向堆叠条，两个色块</li>
+        <li>目的：让「样品才是最大成本」这件事无法被忽略</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">④ 目标达成子弹图</div>
+      <div class="card-sub">Bullet chart · 实际 vs 目标</div>
+      <ul style="font-size:13.5px;margin-left:16px">
+        <li>背景灰条 = 目标值，深色条 = 实际值，刻度线 = 上周值</li>
+        <li>对 GMV / ROI / 出单达人数三个指标各做一条</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>布局建议</h3>
+  <div class="wire">
+    <div class="wire-bar"><span class="wt">模块一布局线框</span><span class="ws">Dashboard 顶部 · 1440 × 320</span></div>
+    <div style="padding:14px">
+      <div class="wire-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:10px">
+        <div class="wire-body hl"><div class="wb-h">Creator GMV</div><div class="wb-c"><div style="font-size:20px;font-weight:620;color:var(--t1)">$375</div><div style="color:#137A4E;font-size:10px">▲ 环比 +%</div><div class="spark" style="margin-top:6px"><i style="height:30%"></i><i style="height:45%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:52%"></i><i style="height:78%"></i><i style="height:70%"></i><i style="height:100%"></i></div></div></div>
+        <div class="wire-body"><div class="wb-h">Net GMV</div><div class="wb-c"><div style="font-size:20px;font-weight:620;color:var(--t1)">$375</div><div style="color:var(--t3);font-size:10px">退款 $0</div></div></div>
+        <div class="wire-body hl"><div class="wb-h">ROI（纯佣 / 全成本）</div><div class="wb-c"><div style="font-size:20px;font-weight:620;color:var(--accent)">10.99x</div><div style="font-size:12px;color:var(--red);font-weight:600">全成本 0.19x</div><div style="font-size:9.5px;color:var(--t3);margin-top:3px">双口径并列，主动暴露</div></div></div>
+        <div class="wire-body"><div class="wb-h">出单达人 / 激活率</div><div class="wb-c"><div style="font-size:20px;font-weight:620;color:var(--t1)">8</div><div style="color:var(--red);font-size:10px">激活率 0.7%</div></div></div>
+      </div>
+      <div class="wire-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:10px">
+        <div class="wire-body"><div class="wb-h">佣金支出 / 佣金率</div><div class="wb-c"><div style="font-size:16px;font-weight:600;color:var(--t1)">$34.12</div><div style="font-size:10px">9.1%</div></div></div>
+        <div class="wire-body"><div class="wb-h">寄样 / 单样品产出</div><div class="wb-c"><div style="font-size:16px;font-weight:600;color:var(--t1)">389</div><div style="font-size:10px;color:var(--red)">$0.96 / 件</div></div></div>
+        <div class="wire-body"><div class="wb-h">内容数 / GPM</div><div class="wb-c"><div style="font-size:16px;font-weight:600;color:var(--t1)">475</div><div style="font-size:10px">$3.20 / 千播</div></div></div>
+        <div class="wire-body"><div class="wb-h">退款金额 / 退款率</div><div class="wb-c"><div style="font-size:16px;font-weight:600;color:var(--t1)">$0.00</div><div style="font-size:10px">0.0%</div></div></div>
+      </div>
+      <div class="wire-grid" style="grid-template-columns:2.4fr 1fr">
+        <div class="wire-body hl"><div class="wb-h">周度 GMV（柱） × ROI（双线）＋ 目标参考线</div><div class="wb-c"><div class="spark" style="height:44px"><i style="height:35%"></i><i style="height:52%"></i><i style="height:44%"></i><i class="q" style="height:70%"></i><i class="q" style="height:62%"></i><i class="q" style="height:88%"></i><i style="height:80%"></i><i style="height:100%"></i></div></div></div>
+        <div class="wire-body"><div class="wb-h">成本结构（佣金 vs 样品）</div><div class="wb-c"><div style="display:flex;height:14px;border-radius:4px;overflow:hidden;margin-top:10px"><span style="width:1.7%;background:var(--red);display:block"></span><span style="width:98.3%;background:#E39B93;display:block"></span></div><div style="font-size:9.5px;margin-top:6px">佣金 $34 · 样品 $1,945</div></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="wire-cap">高度控制在 <strong>320px</strong> 以内，保证 1440 × 900 截屏时模块一 + 模块二上半部能同屏进周报 PPT。</p>
+</section>
+
+<!-- ============ 04 ============ -->
+<section id="s4">
+  <span class="sec-num">04 / MODULE 02</span>
+  <h2>模块二 · 达人分层诊断</h2>
+  <p class="lede">整套看板的分析重心。任务回答一个 BD 最该回答的问题：<strong>这 1,000 多号人里，谁值得我下周继续花时间？</strong></p>
+
+  <h3>设计思路</h3>
+  <ol>
+    <li><strong>用漏斗状态分层，而不是只用 GMV 排名。</strong>当前 99.3% 的达人 GMV 为 0，若只按 GMV 排序，整张图 99% 是空白。按漏斗状态分层（S/A/B/C/D/E/F）后每层都有人、都有明确动作，可视化才有信息量。</li>
+    <li><strong>每层给两份占比：产出占比 + 样品消耗占比。</strong>把这两个占比并排放，错配就自己跳出来了——这正是当前数据里最触目惊心的那件事。</li>
+    <li><strong>散点图找「高投入零产出」。</strong>X = 寄样数，Y = GMV，气泡大小 = 曝光。右上角是明星，右下角（高投入零产出）是止损对象，一眼可辨。</li>
+    <li><strong>下钻到名单。</strong>所有分层图都设为筛选源，点任意一层，右侧明细表立刻出该层达人清单，可直接导出作为本周跟进名单。</li>
+  </ol>
+
+  <h3>核心指标</h3>
+  <ul>
+    <li><strong>各层人数分布</strong>（Countd creator_key by Tier）</li>
+    <li><strong>漏斗逐级转化率</strong>：邀约 → 寄样 → 铺货 → 出内容 → 拿到曝光 → 破零出单</li>
+    <li><strong>GMV 集中度</strong>：Top N 达人 GMV 占比 + 帕累托曲线（当前 Top 10 = 100%）</li>
+    <li><strong>样品消耗集中度</strong>：各层样品占比（当前 C + E 层 = 99.0%）</li>
+    <li><strong>层级跃迁数</strong>：本周有多少人从 F→E、E→D、C→B（跃迁比绝对值更能反映运营有效性）</li>
+    <li><strong>破零率</strong>：破零达人 / 寄样达人（当前 8 / 350 = 2.3%）</li>
+  </ul>
+
+  <h3>推荐图表</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">① 七层漏斗条形图 + 转化率标注</div>
+      <div class="card-sub">主图 · 横向条形 + 相邻层转化率</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">横向条形，X = 达人数；相邻两层之间标注转化率（如「寄样→铺货 25.1%」）。<strong>Tableau 原生不支持桑基图</strong>，用「条形图 + 百分比标注」替代即可，可读性和信息量都不差。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">② 分层 × 双占比对比条形图</div>
+      <div class="card-sub">人数占比 / GMV 占比 / 样品占比 三联</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">把三条占比并列，一眼看出「资源给了谁、回报来自谁」。这张图是模块二的灵魂，建议放在区域正中间。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">③ 投入 vs 产出散点图</div>
+      <div class="card-sub">X = 样品数，Y = GMV，大小 = 曝光，颜色 = 分层</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">加一条对角线参考线（均值赔付线），线下的点全部是止损候选。当 GMV 普遍为 0 时，Y 轴改用对数轴，或换成「播放 / GMV」双指标。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">④ 帕累托图</div>
+      <div class="card-sub">达人排名（降序）累计 GMV%</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">柱 = 单个达人 GMV（降序），线 = 累计占比 %，加 80% 参考线。当前 Top 10 就贡献 100%，这张图会很短——但正因如此，它在周报里最有说服力。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">⑤ 分层明细交叉表</div>
+      <div class="card-sub">筛选联动目标 · 可直接导出名单</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">行 = Creator name，列 = Tier / GMV / 订单 / 样品 / 内容 / CTR / CTOR / AOV / 最近动作周。GMV 列加 bar-in-cell 条件格式。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">⑥ 层级跃迁矩阵</div>
+      <div class="card-sub">上周层级 × 本周层级 热力矩阵</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">对角线 = 停留，上三角 = 晋升，下三角 = 流失。这张图能直接量化「本周运营动作产生了多少层级跃迁」，是汇报时的硬核素材。</p>
+    </div>
+  </div>
+
+  <h3>布局建议</h3>
+  <div class="wire">
+    <div class="wire-bar"><span class="wt">模块二布局线框</span><span class="ws">1440 × 620</span></div>
+    <div style="padding:14px">
+      <div class="wire-grid" style="grid-template-columns:1.15fr 1.15fr 1.5fr;margin-bottom:10px">
+        <div class="wire-body"><div class="wb-h">① 漏斗 · 邀约 → 破零（含转化率标注）</div><div class="wb-c">
+          <div class="funnel-row"><span class="fl">邀约</span><span class="fb"><span class="ff" style="width:100%"></span></span><span class="fv">1,068</span></div>
+          <div class="funnel-row"><span class="fl">寄样</span><span class="fb"><span class="ff" style="width:32.8%"></span></span><span class="fv">350 · 32.8%</span></div>
+          <div class="funnel-row"><span class="fl">铺货</span><span class="fb"><span class="ff" style="width:25.1%"></span></span><span class="fv">268 · 25.1%</span></div>
+          <div class="funnel-row"><span class="fl">出内容</span><span class="fb"><span class="ff" style="width:25.1%"></span></span><span class="fv">268 · 100%</span></div>
+          <div class="funnel-row"><span class="fl">有曝光</span><span class="fb"><span class="ff" style="width:83.4%"></span></span><span class="fv">891 · 83.4%</span></div>
+          <div class="funnel-row"><span class="fl">破零</span><span class="fb"><span class="ff" style="width:0.8%;min-width:3px"></span></span><span class="fv">8 · 0.7%</span></div>
+        </div></div>
+        <div class="wire-body hl"><div class="wb-h">② 分层 × 双占比（人数 / GMV / 样品）</div><div class="wb-c">
+          <div class="mbar"><span class="mn">A 稳定 2人</span><span class="mt"><span class="mf" style="width:100%"></span></span><span class="mv">GMV 64.5%</span></div>
+          <div class="mbar"><span class="mn">B 破零 6人</span><span class="mt"><span class="mf" style="width:35%"></span></span><span class="mv">GMV 35.2%</span></div>
+          <div class="mbar"><span class="mn">C 263人</span><span class="mt"><span class="mf" style="width:57%;background:#E8E8ED"></span></span><span class="mv">GMV 0%</span></div>
+          <div class="mbar"><span class="mn">样品</span><span class="mt"><span class="mf" style="width:57%;background:#E39B93"></span></span><span class="mv">样品 57.1%</span></div>
+          <div class="mbar"><span class="mn">E 156人</span><span class="mt"><span class="mf" style="width:42%;background:#E39B93"></span></span><span class="mv">样品 41.9%</span></div>
+          <div class="mbar"><span class="mn">F 641人</span><span class="mt"><span class="mf" style="width:60%;background:#EFEFF2"></span></span><span class="mv">人数 60.0%</span></div>
+          <div style="margin-top:8px;padding:6px 8px;background:var(--red-soft);border-radius:6px;color:#9C2F24;font-size:10px;font-weight:600">⚠ C+E 层吃掉 99.0% 样品，产出 $0</div>
+        </div></div>
+        <div class="wire-body"><div class="wb-h">③ 投入 vs 产出散点（X = 样品，Y = GMV，大小 = 曝光）</div><div class="wb-c">
+          <div style="position:relative;height:96px;border-bottom:1px solid var(--line);border-left:1px solid var(--line)">
+            <div style="position:absolute;left:8%;bottom:6%;width:6px;height:6px;border-radius:50%;background:#E39B93"></div>
+            <div style="position:absolute;left:20%;bottom:14%;width:8px;height:8px;border-radius:50%;background:#E39B93"></div>
+            <div style="position:absolute;left:36%;bottom:9%;width:5px;height:5px;border-radius:50%;background:#E39B93"></div>
+            <div style="position:absolute;left:52%;bottom:22%;width:9px;height:9px;border-radius:50%;background:#E39B93"></div>
+            <div style="position:absolute;left:68%;bottom:30%;width:6px;height:6px;border-radius:50%;background:#E39B93"></div>
+            <div style="position:absolute;left:80%;bottom:52%;width:11px;height:11px;border-radius:50%;background:var(--accent)"></div>
+            <div style="position:absolute;left:90%;bottom:80%;width:13px;height:13px;border-radius:50%;background:#0B6B52"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;border-top:1px dashed #D0D0D5"></div>
+            <div style="position:absolute;right:4px;top:2px;font-size:9px;color:#0B6B52;font-weight:600">明星区</div>
+            <div style="position:absolute;left:4px;bottom:1px;font-size:9px;color:#9C2F24;font-weight:600">止损区</div>
+          </div>
+        </div></div>
+      </div>
+      <div class="wire-grid" style="grid-template-columns:1fr 2fr">
+        <div class="wire-body"><div class="wb-h">④ 帕累托（Top 达人累计 GMV%）</div><div class="wb-c"><div class="spark" style="height:56px"><i style="height:100%"></i><i style="height:78%"></i><i style="height:37%"></i><i style="height:19%"></i><i style="height:13%"></i><i class="q" style="height:10%"></i><i class="q" style="height:10%"></i><i class="q" style="height:9%"></i><i class="q" style="height:1%"></i><i class="q" style="height:1%"></i></div><div style="font-size:9.5px;margin-top:5px">Top 10 = 100% GMV</div></div></div>
+        <div class="wire-body hl"><div class="wb-h">⑤ 分层明细表（点击任一图 → 自动筛选下钻，可直接导出）</div><div class="wb-c">
+          <div style="font-family:var(--mono);font-size:9.5px;line-height:1.75">
+            creator_key | Tier | GMV | 订单 | 样品 | 内容 | CTR | CTOR | AOV | 最近动作周<br>
+            <span style="color:var(--t3)">— 由上方图表筛选联动 —</span>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+  <p class="wire-cap">①②③ 三张图设为<strong>互相联动的筛选源</strong>，⑤ 明细表只作为接收端。交互逻辑越简单，周报会上演示越顺。</p>
+</section>
+
+<!-- ============ 05 ============ -->
+<section id="s5">
+  <span class="sec-num">05 / MODULE 03</span>
+  <h2>模块三 · ROI 多维度拆解</h2>
+  <p class="lede">回答「数字为什么会变」。前面的模块告诉你发生了什么，这个模块告诉你<strong>为什么</strong>——也是真正体现分析深度、区别于普通数据搬运的地方。</p>
+
+  <h3>设计思路</h3>
+  <ol>
+    <li><strong>用已验证的乘法链做瀑布归因。</strong>既然 <code>GMV = Impressions × CTR × CTOR × AOV</code> 已验证自洽（误差 0.3%），就可以把「本周 GMV 相对上周的变化」精确拆成四个因子的贡献额，做成瀑布图。这是最有含金量的一张图。</li>
+    <li><strong>内容形态对比。</strong>短视频 vs 直播 vs 商品卡（showcase）三种归因 GMV 各自的体量与效率。源表已提供三个拆分字段，可直接用。</li>
+    <li><strong>效率指标 z-score 标准化后同图对比。</strong>CTR / CTOR / AOV / GPM 量纲不同，不能直接画在一张图上，标准化后可同一坐标系呈线。</li>
+    <li><strong>分层 × 周热力图。</strong>找「哪一层在哪个周有过跃迁」，给复盘提供时间切片。</li>
+  </ol>
+
+  <h3>核心指标</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:16%">指标</th><th style="width:24%">定义</th><th class="num" style="width:12%">当前值</th><th>拆解用途</th></tr></thead>
+      <tbody>
+        <tr><td>商品曝光 Impressions</td><td><code>SUM([Product impressions])</code></td><td class="num">127,087</td><td>漏斗最上游，看触达规模</td></tr>
+        <tr><td>CTR</td><td>点击 / 曝光</td><td class="num">2.21%</td><td>内容吸引力与挂车位置是否合理</td></tr>
+        <tr><td>CTOR</td><td>下单 / 点击</td><td class="num">0.36%</td><td><strong>当前最大短板</strong>，反映落地页与价格锚点问题</td></tr>
+        <tr><td>AOV</td><td>GMV / 订单</td><td class="num">$37.50</td><td>组合装 / 满减策略效果</td></tr>
+        <tr><td>GPM</td><td>千次播放 GMV</td><td class="num">$3.20</td><td>跨平台、跨达人横向可比的效率单位</td></tr>
+        <tr><td>退款率</td><td>Refunds / GMV</td><td class="num">0.00%</td><td>宠物品类需持续监控（食品适口性退货风险）</td></tr>
+        <tr><td>佣金率</td><td>Commission / GMV</td><td class="num">9.10%</td><td>提佣促产出的空间还剩多少</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="nt">当前数据的短板在哪</span>
+    CTR 2.21% 属于健康区间，但 <strong>CTOR 只有 0.36%</strong>——每 278 次点击进入才产生 1 单。这说明问题不在「达人不吸引人」，而在「点进来之后买不动」：可能是落地页评分不足、价格缺乏锚点、评价数太少或主图不够打动人。<strong>这个结论和「样品投错人」是两个彼此独立的问题，看板必须能分开呈现，否则会开错药方。</strong>
+  </div>
+
+  <h3>推荐图表</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">① GMV 变动瀑布图（Waterfall）</div>
+      <div class="card-sub">主图 · 四因子归因</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">起点 = 上周 GMV，四段浮动条依次叠加「曝光贡献 / CTR 贡献 / CTOR 贡献 / AOV 贡献」，终点 = 本周 GMV。正贡献绿、负贡献红。Tableau 用 <strong>Gantt 条形图 + 运行总和（Running Sum）</strong>构造，或直接用 2022.3+ 的内置瀑布图类型。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">② 内容形态 GMV 结构</div>
+      <div class="card-sub">视频 / 直播 / 商品卡</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">堆叠面积图看结构随周变化；旁边配一张「各形态 GPM 对比」条形图看效率。当前 100% GMV 来自视频、0% 来自直播，但已经开了 163 场直播——这个反差本身就是周报里值得提的一句。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">③ 效率指标标准化折线</div>
+      <div class="card-sub">CTR / CTOR / AOV / GPM（z-score）</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">同图四条线，看出环比恶化的是哪一环。加均值 ±1σ 参考带辅助判断异常。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">④ 分层 × 周 GMV 热力矩阵</div>
+      <div class="card-sub">颜色深浅 = GMV</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">行 = Tier，列 = week_start。全周期复盘时用来找「哪一周哪个层级起量了」，再回查那周做了什么动作。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">⑤ CTR–CTOR 四象限</div>
+      <div class="card-sub">达人群体的象限诊断</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">X = CTR，Y = CTOR，十字参考线 = 各组中位数。右上「叫好又叫座」→ 加码；右下「有人看没人买」→ 优化落地页；左上 → 调整挂车方式；左下 → 淘汰。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">⑥ ROI 分布箱线图</div>
+      <div class="card-sub">按分层看 ROI 离散度</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">箱体 + 须线，识别异常值与小样本噪声。当前只有 8 个有效样本，这张图会很难看——<strong>建议积累 4 周数据后再启用</strong>，避免汇报时被质疑。</p>
+    </div>
+  </div>
+
+  <h3>布局建议</h3>
+  <div class="wire">
+    <div class="wire-bar"><span class="wt">模块三布局线框</span><span class="ws">1440 × 520</span></div>
+    <div style="padding:14px">
+      <div class="wire-grid" style="grid-template-columns:1.6fr 1fr;margin-bottom:10px">
+        <div class="wire-body hl"><div class="wb-h">① GMV 环比瀑布归因（上周 → 曝光 → CTR → CTOR → AOV → 本周）</div><div class="wb-c">
+          <div style="display:flex;align-items:flex-end;gap:5px;height:76px;padding-top:6px">
+            <div style="flex:1;background:#D9E2E9;height:52%;border-radius:3px 3px 0 0"></div>
+            <div style="flex:1;background:#A8DCC8;height:10%;border-radius:3px"></div>
+            <div style="flex:1;background:#E39B93;height:8%;margin-bottom:8%;border-radius:3px"></div>
+            <div style="flex:1;background:#A8DCC8;height:13%;margin-bottom:9%;border-radius:3px"></div>
+            <div style="flex:1;background:#A8DCC8;height:11%;margin-bottom:16%;border-radius:3px"></div>
+            <div style="flex:1;background:var(--accent);height:60%;border-radius:3px 3px 0 0"></div>
+          </div>
+          <div style="font-size:9px;color:var(--t3);margin-top:8px">上周 · 曝光贡献 · CTR 贡献 · CTOR 贡献 · AOV 贡献 · 本周</div>
+        </div></div>
+        <div class="wire-body"><div class="wb-h">③ 效率指标标准化折线（CTR / CTOR / AOV / GPM）</div><div class="wb-c">
+          <div class="spark" style="height:62px"><i style="height:40%"></i><i style="height:55%"></i><i style="height:48%"></i><i class="q" style="height:65%"></i><i class="q" style="height:58%"></i><i class="q" style="height:72%"></i><i style="height:66%"></i><i style="height:82%"></i></div>
+        </div></div>
+      </div>
+      <div class="wire-grid" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="wire-body"><div class="wb-h">② 内容形态 GMV 结构</div><div class="wb-c">
+          <div class="donut-row"><span class="dl" style="background:var(--accent)"></span><span class="dn">视频</span><span class="dv">100%</span></div>
+          <div class="donut-row"><span class="dl" style="background:var(--blue)"></span><span class="dn">直播（163 场）</span><span class="dv">0%</span></div>
+          <div class="donut-row"><span class="dl" style="background:#D9E2E9"></span><span class="dn">商品卡</span><span class="dv">0%</span></div>
+        </div></div>
+        <div class="wire-body"><div class="wb-h">⑤ CTR–CTOR 四象限</div><div class="wb-c">
+          <div style="position:relative;height:66px;border:1px solid var(--line);border-radius:4px;background:#fff">
+            <div style="position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed #DCDCE2"></div>
+            <div style="position:absolute;left:0;right:0;top:50%;border-top:1px dashed #DCDCE2"></div>
+            <div style="position:absolute;left:14px;top:8px;font-size:8.5px;color:var(--t3)">有人看<br>没人买</div>
+            <div style="position:absolute;right:10px;top:8px;font-size:8.5px;color:#0B6B52;font-weight:600">加码区</div>
+            <div style="position:absolute;right:10px;bottom:6px;font-size:8.5px;color:var(--t3)">待观察</div>
+            <div style="position:absolute;left:14px;bottom:6px;font-size:8.5px;color:#9C2F24;font-weight:600">淘汰区</div>
+          </div>
+        </div></div>
+        <div class="wire-body"><div class="wb-h">④ 分层 × 周 GMV 热力矩阵</div><div class="wb-c">
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:2px">
+            <span style="background:#F0F0F3;height:11px;border-radius:2px;display:block"></span><span style="background:#E8F5F1;height:11px;border-radius:2px;display:block"></span><span style="background:#C7E9DC;height:11px;border-radius:2px;display:block"></span><span style="background:#10A37F;height:11px;border-radius:2px;display:block"></span><span style="background:#C7E9DC;height:11px;border-radius:2px;display:block"></span><span style="background:#E8F5F1;height:11px;border-radius:2px;display:block"></span>
+            <span style="background:#F0F0F3;height:11px;border-radius:2px;display:block"></span><span style="background:#F0F0F3;height:11px;border-radius:2px;display:block"></span><span style="background:#E8F5F1;height:11px;border-radius:2px;display:block"></span><span style="background:#C7E9DC;height:11px;border-radius:2px;display:block"></span><span style="background:#E8F5F1;height:11px;border-radius:2px;display:block"></span><span style="background:#F0F0F3;height:11px;border-radius:2px;display:block"></span>
+            <span style="background:#F7F7F9;height:11px;border-radius:2px;display:block"></span><span style="background:#F0F0F3;height:11px;border-radius:2px;display:block"></span><span style="background:#F0F0F3;height:11px;border-radius:2px;display:block"></span><span style="background:#E8F5F1;height:11px;border-radius:2px;display:block"></span><span style="background:#C7E9DC;height:11px;border-radius:2px;display:block"></span><span style="background:#E8F5F1;height:11px;border-radius:2px;display:block"></span>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+  <p class="wire-cap">瀑布图区域建议留足宽度（≥ 560px），因子标签直接写在浮动条上方，不依赖图例——周报截图时图例经常被裁掉。</p>
+</section>
+
+<!-- ============ 06 ============ -->
+<section id="s6">
+  <span class="sec-num">06 / MODULE 04</span>
+  <h2>模块四 · 优化策略与效果追踪</h2>
+  <p class="lede">把分析变成动作，并验证动作有没有用。这是最能体现策略思维的一环——前三个模块是「看懂」，这一模块是「做成」。</p>
+
+  <h3>设计思路</h3>
+  <ol>
+    <li><strong>输出四张可执行名单。</strong>不输出花哨图表，输出「下周该联系谁」的清单。每张名单配人数、预计影响 GMV、预计节省样品数，让看板直接驱动动作。</li>
+    <li><strong>干预前 / 后对照（Before-After Cohort）。</strong>这才是「效果追踪」的本质。以 <code>D_Intervention</code> 里记录的 <code>intervention_week</code> 为分界，对比干预前 2 周 vs 后 2 周的同组达人 GMV / 激活率变化。没有对照组，任何优化效果都是自说自话。</li>
+    <li><strong>目标达成追踪用子弹图。</strong>实际 vs 目标（参数化），每人 / 每层一条。</li>
+    <li><strong>用动态文本自动生成周报结论。</strong>把 <code>[Weekly Headline]</code> 放在模块顶部文本框，每周自动更新。这是节省时间最实在的一处。</li>
+  </ol>
+
+  <h3>四张行动名单（含判定逻辑）</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:14%">名单</th><th style="width:32%">判定条件（Tableau 筛选字段）</th><th style="width:12%">当前规模</th><th>动作</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="tag t-out">加码名单</span></td>
+          <td>Tier ∈ {A, B} 且 GMV per Sample 高于中位数</td>
+          <td class="num">8 人</td>
+          <td>追加 SKU、提佣 2–3pt、争取排期；当前这 8 人只用了 4 件样品，明显加得不够</td>
+        </tr>
+        <tr>
+          <td><span class="tag t-qua">孵化名单</span></td>
+          <td>Tier = C（有内容有曝光，GMV = 0）且 Impressions &gt; 1,000</td>
+          <td class="num">263 人</td>
+          <td><strong>最高优先级。</strong>他们已经免费产出了 463 条内容，问题在转化端：优化挂车位置、补口播话术、检查落地页评分</td>
+        </tr>
+        <tr>
+          <td><span class="tag t-cost">止损名单</span></td>
+          <td>Samples shipped ≥ 2 且累计 Content = 0 且 GMV = 0，超过 3 周</td>
+          <td class="num">156 人</td>
+          <td>暂停寄样，转一次性催更；释放出的样品转投向 A/B 层</td>
+        </tr>
+        <tr>
+          <td><span class="tag" style="background:#F1F1F4;color:#6E6E73">清退名单</span></td>
+          <td>Tier = F 且入池超过 4 周无动作</td>
+          <td class="num">641 人</td>
+          <td>批量二次触达一轮，仍无回应则移出运营池，缩小分母提升整体激活率</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="nt">可以直接用的一句话</span>
+    按当前数据算：<strong>止损名单里的 156 人消耗了 163 件样品且从未产出任何内容</strong>。把这批样品改投给已验证的 A/B 层 8 位达人，单样品产出有望从 $0.96 提升到 $60+ 量级。这是本周最确定的一笔改善，且不需要任何额外预算。
+  </div>
+
+  <h3>核心指标</h3>
+  <ul>
+    <li><strong>名单命中数</strong>：四张名单各自的达人数（周跟上，看是否在收敛）</li>
+    <li><strong>干预后 GMV 增量</strong>：Before vs After 差值（Cohort 对照）</li>
+    <li><strong>干预成功率</strong>：干预后实现层级跃迁的达人占比</li>
+    <li><strong>样品重定向数量</strong>：止损释放的样品件数、转投对象</li>
+    <li><strong>目标达成率</strong>：Actual / Target（参数）</li>
+    <li><strong>新增破零数</strong>：本周首次产生 GMV 的达人数 <code>[New Breakouts]</code></li>
+  </ul>
+
+  <h3>推荐图表</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">① 四个名单卡片</div>
+      <div class="card-sub">人数 + 预计影响 + 「点击导出」</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">横向四张卡，每张卡上半部分是人数 + 判定条件简述，下半部分是「点击查看名单」动作（Dashboard Action → 跳转到明细 Tab）。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">② Before / After 柱线对比</div>
+      <div class="card-sub">同一批达人，干预前 2 周 vs 后 2 周</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">用 <code>D_Intervention.after_flag</code> 分组，同时保留一组「未干预对照组」做基准。有对照组，汇报时才站得住。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">③ 目标达成子弹图矩阵</div>
+      <div class="card-sub">每个层级一行</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">灰底条 = 目标，深色条 = 实际，刻度线 = 上周。行按 Tier 排列，一眼看出哪层落后。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">④ 样品投放结构迁移图</div>
+      <div class="card-sub">样品流向：止损层 → 加码层</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">堆叠面积看各层样品占比随周变化。目标曲线是「C/E/F 灰度区收缩、A/B 绿色区扩张」，这条主旋律能直接证明策略在生效。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">⑤ 自动周报结论文本</div>
+      <div class="card-sub">动态标题 <code>[Weekly Headline]</code></div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">放在模块最顶部的文本框里。每周刷数自动重写，复制粘贴即可作为周报导语。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">⑥ 累计投入产出曲线</div>
+      <div class="card-sub">累计样品数 vs 累计 GMV</div>
+      <p style="font-size:13.5px;color:var(--t2);margin:0">全周期复盘专用。双轴累计曲线，斜率变化直观反映投放效率是否在改善。</p>
+    </div>
+  </div>
+
+  <h3>布局建议</h3>
+  <div class="wire">
+    <div class="wire-bar"><span class="wt">模块四布局线框</span><span class="ws">1440 × 460</span></div>
+    <div style="padding:14px">
+      <div class="wire-body hl" style="margin-bottom:10px"><div class="wb-h">⑤ 自动周报结论（动态文本）</div><div class="wb-c"><div style="font-size:11.5px;color:var(--t1);font-family:var(--mono)">本周 Creator GMV $375，环比 —%；纯佣 ROI 10.99x，全成本 ROI 0.19x；出单达人 8 位，本周新增破零 — 位。</div></div></div>
+      <div class="wire-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:10px">
+        <div class="wire-body"><div class="wb-h">加码名单</div><div class="wb-c"><div style="font-size:17px;font-weight:620;color:var(--accent)">8 人</div><div style="font-size:9.5px">预计 GMV 影响 +$—</div></div></div>
+        <div class="wire-body"><div class="wb-h">孵化名单（最高优先级）</div><div class="wb-c"><div style="font-size:17px;font-weight:620;color:var(--amber)">263 人</div><div style="font-size:9.5px">已产出 463 条内容</div></div></div>
+        <div class="wire-body"><div class="wb-h">止损名单</div><div class="wb-c"><div style="font-size:17px;font-weight:620;color:var(--red)">156 人</div><div style="font-size:9.5px">可释放 163 件样品</div></div></div>
+        <div class="wire-body"><div class="wb-h">清退名单</div><div class="wb-c"><div style="font-size:17px;font-weight:620;color:var(--t2)">641 人</div><div style="font-size:9.5px">缩小分母提激活率</div></div></div>
+      </div>
+      <div class="wire-grid" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="wire-body"><div class="wb-h">② Before / After 干预对照</div><div class="wb-c"><div class="spark" style="height:48px"><i class="q" style="height:30%"></i><i class="q" style="height:34%"></i><i style="height:58%"></i><i style="height:74%"></i><i style="height:82%"></i><i style="height:90%"></i></div><div style="font-size:9px;margin-top:4px">前2周 | 后2周（含对照组）</div></div></div>
+        <div class="wire-body"><div class="wb-h">③ 目标达成子弹图矩阵</div><div class="wb-c">
+          <div style="margin-bottom:6px"><div style="font-size:9px">A 层 GMV</div><div style="height:8px;background:#EFEFF2;border-radius:3px;position:relative"><span style="position:absolute;left:0;top:0;bottom:0;width:72%;background:var(--accent);border-radius:3px;display:block"></span><span style="position:absolute;left:88%;top:-2px;bottom:-2px;width:2px;background:#8E8E93;display:block"></span></div></div>
+          <div style="margin-bottom:6px"><div style="font-size:9px">B 层 GMV</div><div style="height:8px;background:#EFEFF2;border-radius:3px;position:relative"><span style="position:absolute;left:0;top:0;bottom:0;width:41%;background:var(--accent);border-radius:3px;display:block"></span></div></div>
+          <div><div style="font-size:9px">C 层破零数</div><div style="height:8px;background:#EFEFF2;border-radius:3px;position:relative"><span style="position:absolute;left:0;top:0;bottom:0;width:9%;background:#E39B93;border-radius:3px;display:block"></span></div></div>
+        </div></div>
+        <div class="wire-body"><div class="wb-h">④ 样品投放结构迁移</div><div class="wb-c"><div class="spark" style="height:48px"><i style="height:44%;background:#E39B93"></i><i style="height:48%;background:#E39B93"></i><i style="height:52%;background:#E39B93"></i><i style="height:60%"></i><i style="height:68%"></i><i style="height:80%"></i></div><div style="font-size:9px;margin-top:4px">灰度=止损层占比收缩，绿色=加码层占比上升</div></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="wire-cap">四张名单卡设为 <strong>Dashboard Action 触发源</strong>：点击任意一张卡 → 跳转到「明细 Tab」并带上该名单筛选，省掉每次手筛的时间。</p>
+</section>
+
+<!-- ============ 07 ============ -->
+<section id="s7">
+  <span class="sec-num">07 / VISUAL SYSTEM</span>
+  <h2>视觉规范：极简（Apple / OpenAI 风格）</h2>
+  <p class="lede">风格原则只有一条：<strong>让数据说话，让装饰闭嘴</strong>。大量留白、弱边框、单一强调色、去所有冗余线条。这套规范可直接固化成 Tableau 的主题文件（<code>.twb</code> 偏好 + 自定义调色板 <code>Preferences.tps</code>）。</p>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="card-title">色板</div>
+      <div style="display:flex;flex-direction:column;gap:9px;margin-top:10px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:34px;height:34px;border-radius:9px;background:#10A37F;flex-shrink:0"></span><div><b style="font-size:13px">#10A37F</b><div style="font-size:11.5px;color:var(--t2)">主强调色 · 正向 / 达标</div></div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:34px;height:34px;border-radius:9px;background:#0071E3;flex-shrink:0"></span><div><b style="font-size:13px">#0071E3</b><div style="font-size:11.5px;color:var(--t2)">辅助色 · 直播 / 对照组</div></div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:34px;height:34px;border-radius:9px;background:#B45309;flex-shrink:0"></span><div><b style="font-size:13px">#B45309</b><div style="font-size:11.5px;color:var(--t2)">警示 · 待观察层级</div></div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:34px;height:34px;border-radius:9px;background:#C0392B;flex-shrink:0"></span><div><b style="font-size:13px">#C0392B</b><div style="font-size:11.5px;color:var(--t2)">负向 / 止损</div></div></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:34px;height:34px;border-radius:9px;background:#E8E8ED;border:1px solid #D6D6DC;flex-shrink:0"></span><div><b style="font-size:13px">#E8E8ED</b><div style="font-size:11.5px;color:var(--t2)">分隔线 / 目标底条</div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">文字层级</div>
+      <div style="margin-top:10px;line-height:1.9;font-size:13.5px">
+        <div><span style="color:#1D1D1F;font-weight:600">#1D1D1F</span> — 主标题 / KPI 数值（20–28pt）</div>
+        <div><span style="color:#6E6E73">#6E6E73</span> — 副标题 / 轴标签（11–13pt）</div>
+        <div><span style="color:#8E8E93">#8E8E93</span> — 注释 / 数据来源（9–10pt）</div>
+      </div>
+      <h4 style="margin-top:16px">字体</h4>
+      <p style="font-size:13px;color:var(--t2);margin:0">SF Pro Display / Helvetica Neue / Inter<br>中文：PingFang SC<br>数字建议统一用 tabular figures（等宽），避免 KPI 跳动</p>
+    </div>
+    <div class="card">
+      <div class="card-title">容器与留白</div>
+      <ul style="font-size:13.5px;margin-left:16px;margin-bottom:0">
+        <li>画布背景 <code>#F5F5F7</code>，工作表背景 <code>#FFFFFF</code></li>
+        <li>卡片圆角 14–18px，描边 <code>1px #E8E8ED</code></li>
+        <li>模块间距 ≥ 20px，卡片内边距 ≥ 16px</li>
+        <li><strong>禁用</strong>：渐变填充、3D 效果、重边框、图例框阴影</li>
+        <li>网格线全部去掉或改为 <code>#F0F0F3</code> 极淡横线</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>七层分层专用色（建议存入自定义调色板）</h3>
+  <div class="wire">
+    <div class="wire-bar"><span class="wt">顺序色板：S → F 由「深绿」渐变到「浅灰」</span><span class="ws">preferences.tps</span></div>
+    <div style="padding:14px;display:flex;gap:6px">
+      <div style="flex:1;text-align:center"><div style="height:38px;border-radius:8px;background:#0B6B52"></div><div style="font-size:10.5px;color:var(--t2);margin-top:5px">S 头部<br>#0B6B52</div></div>
+      <div style="flex:1;text-align:center"><div style="height:38px;border-radius:8px;background:#10A37F"></div><div style="font-size:10.5px;color:var(--t2);margin-top:5px">A 稳定<br>#10A37F</div></div>
+      <div style="flex:1;text-align:center"><div style="height:38px;border-radius:8px;background:#7FCFB8"></div><div style="font-size:10.5px;color:var(--t2);margin-top:5px">B 破零<br>#7FCFB8</div></div>
+      <div style="flex:1;text-align:center"><div style="height:38px;border-radius:8px;background:#B45309"></div><div style="font-size:10.5px;color:var(--t2);margin-top:5px">C 未转化<br>#B45309</div></div>
+      <div style="flex:1;text-align:center"><div style="height:38px;border-radius:8px;background:#8B6BD6"></div><div style="font-size:10.5px;color:var(--t2);margin-top:5px">D 未产出<br>#8B6BD6</div></div>
+      <div style="flex:1;text-align:center"><div style="height:38px;border-radius:8px;background:#C0392B"></div><div style="font-size:10.5px;color:var(--t2);margin-top:5px">E 止损<br>#C0392B</div></div>
+      <div style="flex:1;text-align:center"><div style="height:38px;border-radius:8px;background:#C7C7CC"></div><div style="font-size:10.5px;color:var(--t2);margin-top:5px">F 仅邀约<br>#C7C7CC</div></div>
+    </div>
+  </div>
+  <p class="wire-cap">C / E 层刻意用暖色和红色——它们在图里应当「跳出来」，因为它们是当前最需要处理的两层。</p>
+
+  <h3>Dashboard 尺寸与 Tab 规划</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:20%">Tab</th><th style="width:16%">尺寸</th><th style="width:32%">内容</th><th>使用场景</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Tab 1 · 周报视图</strong></td><td class="num">1440 × 900<br>（固定）</td><td>模块一全量 + 模块二①② + 模块四名单卡</td><td><strong>每周截图直接贴进周报。</strong>固定尺寸保证每周截图构图一致</td></tr>
+        <tr><td><strong>Tab 2 · 全周期复盘</strong></td><td class="num">1440 × 2400<br>（可滚动）</td><td>四模块完整排布，含全部下钻图</td><td>月度 / 季度复盘，以及自助取数分析</td></tr>
+        <tr><td><strong>Tab 3 · 名单明细</strong></td><td class="num">1440 × 900<br>（平铺）</td><td>达人级交叉表 + 单达人迷你看板</td><td>接收 Tab1 的 Action 跳转；导出本周跟进名单</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="nt">全局控件（放最顶部，三个 Tab 共用）</span>
+    <strong>① 周选择器</strong> <code>[p_Week]</code>（日期参数下拉，默认跳到最新周）　<strong>② 视图切换</strong>（单周 / 近 4 周 / 全周期，用同一参数的多值实现）　<strong>③ 品类 / SKU 筛选</strong>（记得「添加到上下文」）　<strong>④ 数据更新时间</strong>文本 <code>MAX([snapshot_date])</code>。<br>有了①和②，就同时满足了「周度周报汇报」和「全周期复盘」两个场景，不需要维护两份文件。
+  </div>
+</section>
+
+<!-- ============ 08 ============ -->
+<section id="s8">
+  <span class="sec-num">08 / WEEKLY SOP</span>
+  <h2>周度更新与周报 SOP</h2>
+  <p class="lede">整套方案的价值，取决于它能不能每周稳定跑起来，而不是做漂亮一次。以下是把每周维护压到 10 分钟以内的标准流程。</p>
+
+  <h3>每周一早上（约 8 分钟）</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th style="width:6%">#</th><th style="width:34%">动作</th><th style="width:14%">耗时</th><th>要点</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td>TikTok Shop 后台 → Affiliate → Creator 报表，<strong>日期区间选「自定义 = 上周一～周日」</strong>，导出</td><td class="num">2 min</td><td>务必选周区间而非累计，否则周增量口径崩掉</td></tr>
+        <tr><td class="num">2</td><td>跑 <code>python prepare.py raw.xlsx 2026-10-06</code>（自动生成日期列、清洗、加 sample_cost）</td><td class="num">1 min</td><td>输出到 <code>data/weeks/</code>，文件名自动带周日期</td></tr>
+        <tr><td class="num">3</td><td>更新 <code>D_Intervention.csv</code>：把上周做的运营动作（提佣 / 寄样 / 催更 / 脚本支持）录进来</td><td class="num">3 min</td><td><strong>最容易漏的一步，但没有它模块四的对照分析就是空的</strong></td></tr>
+        <tr><td class="num">4</td><td>Tableau 打开工作簿 → 数据源「刷新」→ 另存为 <code>dashboard_v1.twb</code></td><td class="num">1 min</td><td>通配符并集自动吸收新文件，无需改任何图表</td></tr>
+        <tr><td class="num">5</td><td>「文件 → 打印为 PDF」或直接截 Tab 1，复制 <code>[Weekly Headline]</code> 作为周报导语</td><td class="num">1 min</td><td>固定尺寸保证每周截图构图一致</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>周报建议写法（三段结构）</h3>
+  <div class="grid3">
+    <div class="card"><div class="card-title">① 这周怎么样</div><div class="card-sub">Tab 1 · 模块一</div><p style="font-size:13.5px;color:var(--t2);margin:0">直接引用自动生成的 Headline，补充 1–2 句对环比的解释（涨在哪、跌在哪）。</p></div>
+    <div class="card"><div class="card-title">② 为什么</div><div class="card-sub">Tab 2 · 模块二 + 模块三</div><p style="font-size:13.5px;color:var(--t2);margin:0">用瀑布归因说清 GMV 变动的驱动因子；用分层图指出资源投放精度问题。</p></div>
+    <div class="card"><div class="card-title">③ 下周做什么</div><div class="card-sub">Tab 1 · 模块四名单卡</div><p style="font-size:13.5px;color:var(--t2);margin:0">四张名单的人数与预计影响；上周干预动作的效果对照结果。</p></div>
+  </div>
+
+  <div class="note amb">
+    <span class="nt">数据质量红线</span>
+    <strong>①</strong> 每周必须按时导出，漏一周会导致趋势断裂且无法补。<strong>②</strong> 导出后立刻校验总行数与 GMV 合计是否与后台一致。<strong>③</strong> 后台若发生历史数据回溯修正，需重跑对应周的清洗。<strong>④</strong> <code>sample_cost</code> 单价口径变更后，务必在周报里注明，否则全成本 ROI 会失去可比性。
+  </div>
+</section>
+
+<!-- ============ 09 ============ -->
+<section id="s9">
+  <span class="sec-num">09 / ROLLOUT</span>
+  <h2>落地排期建议</h2>
+  <p class="lede">不要一次做完。建议分两阶段：先让周报跑起来，再补深度分析。这样第一周就有东西可以交付。</p>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">第一周 · 打通数据链路</div>
+      <div class="card-sub">目标：数据源可自动追加</div>
+      <ul style="font-size:13.5px;margin-left:16px;margin-bottom:0">
+        <li>跑通 <code>prepare.py</code>，产出第一份带日期列的周度 CSV</li>
+        <li>搭建 <code>D_Creator</code> / <code>D_Date</code> 两张维表</li>
+        <li>在 Tableau 里建通配符并集 + 逻辑关系</li>
+        <li>把第 02 节的计算字段全部建好</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">第二周 · 上线 Tab 1 + Tab 3</div>
+      <div class="card-sub">目标：周报可以直接用</div>
+      <ul style="font-size:13.5px;margin-left:16px;margin-bottom:0">
+        <li>完成模块一 KPI 卡组（8 张）+ 双 ROI 卡</li>
+        <li>完成模块二的分层主图与穿透名单表</li>
+        <li>配好 <code>[p_Week]</code> 参数与周切换</li>
+        <li>套用第 07 节的视觉规范并固化成主题</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">第三至四周 · 补齐 Tab 2</div>
+      <div class="card-sub">目标：支撑全周期复盘</div>
+      <ul style="font-size:13.5px;margin-left:16px;margin-bottom:0">
+        <li>瀑布归因、干预对照、热力矩阵上线</li>
+        <li>此时已积累 3–4 周数据，箱线图等统计量图才有意义</li>
+        <li>上线自动 Headline，周报导语实现自动生成</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">可以顺手加的加分项</div>
+      <div class="card-sub">体现效率意识</div>
+      <ul style="font-size:13.5px;margin-left:16px;margin-bottom:0">
+        <li>把 Tab 1 发布到 Tableau Server / Public，给主管一个自助查看链接</li>
+        <li>配一个「ROI 跌破阈值」的自动订阅邮件</li>
+        <li>把周报三段式写成模板，配合自动 Headline，周报产出压到 15 分钟内</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  设计与数据分析基于 <code>ss.xlsx</code>（1,068 位 TikTok Shop Affiliate 达人快照）实算。所有当前值均取自该快照的真实计算结果，样本成本 $5 / 件为示例假设，落地前请按真实货值 + 运费替换。
+</div>
+
+</div>
+</body>
+</html>

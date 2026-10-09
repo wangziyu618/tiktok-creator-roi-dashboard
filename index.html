@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok 纯佣达人 ROI 运营看板 | Creator ROI Dashboard</title>
+<meta name="description" content="TikTok Shop 纯佣（commission-only）达人 ROI 运营看板：核心指标概览、达人七层分层诊断、ROI 多维拆解、优化策略与效果追踪。">
+<style>
+:root{
+  --bg:#F5F5F7; --surface:#FFFFFF; --surface2:#FAFAFA;
+  --line:#E8E8ED; --line-soft:#F0F0F3;
+  --t1:#1D1D1F; --t2:#6E6E73; --t3:#8E8E93;
+  --acc:#10A37F; --acc-soft:#E8F5F1;
+  --blue:#0071E3; --blue-soft:#EAF2FD;
+  --amb:#B45309; --amb-soft:#FDF3E3;
+  --red:#C0392B; --red-soft:#FCEDEB;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--t1);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue","PingFang SC","Microsoft YaHei",Inter,sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em;
+}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px 90px}
+code{font-family:var(--mono);font-size:12.5px;background:var(--surface2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#0B5F4A}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:60;background:rgba(245,245,247,.85);
+  backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-inner{max-width:1240px;margin:0 auto;padding:11px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:650;font-size:15px;letter-spacing:-0.02em;white-space:nowrap}
+.brand b{color:var(--acc)}
+.topbar .spacer{flex:1}
+.topbar select{
+  font:inherit;font-size:13px;padding:6px 10px;border:1px solid var(--line);
+  border-radius:9px;background:#fff;color:var(--t1);cursor:pointer;
+}
+.meta-chip{font-size:12px;color:var(--t3);white-space:nowrap}
+.topbar a{color:var(--t2);text-decoration:none;font-size:12.5px;padding:5px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;transition:.15s}
+.topbar a:hover{color:var(--t1);border-color:#D6D6DC}
+.toc{display:flex;gap:2px;overflow-x:auto;max-width:1240px;margin:0 auto;padding:0 28px 10px}
+.toc a{color:var(--t2);text-decoration:none;font-size:12.5px;padding:4px 10px;border-radius:7px;white-space:nowrap}
+.toc a:hover{background:#fff;color:var(--t1)}
+
+/* ---------- hero ---------- */
+.hero{padding:44px 0 8px}
+.eyebrow{font-size:11.5px;font-weight:650;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);margin-bottom:12px}
+h1{font-size:34px;font-weight:660;letter-spacing:-0.03em;line-height:1.15}
+.hero .sub{margin-top:10px;font-size:15.5px;color:var(--t2);max-width:820px}
+.hero .hl-chip{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:12.5px;color:var(--t2);background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px}
+.hero .hl-chip b{color:var(--t1)}
+
+/* ---------- modules ---------- */
+section{margin-top:46px;scroll-margin-top:96px}
+.sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+.sec-num{font-family:var(--mono);font-size:11.5px;color:var(--acc);font-weight:700;letter-spacing:.08em}
+h2{font-size:22px;font-weight:650;letter-spacing:-0.02em}
+.sec-desc{font-size:13.5px;color:var(--t2);margin:6px 0 16px;max-width:900px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.card h3{font-size:14.5px;font-weight:640;margin-bottom:2px}
+.card .card-sub{font-size:12px;color:var(--t3);margin-bottom:10px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-31{display:grid;grid-template-columns:1.45fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:1000px){.grid-2,.grid-31,.grid-3,.grid-4{grid-template-columns:1fr}}
+
+/* ---------- KPI ---------- */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+@media(max-width:1000px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.kpi-grid{grid-template-columns:1fr}}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi.acc{border-color:rgba(16,163,127,.35);background:linear-gradient(180deg,var(--acc-soft) 0%,#fff 70%)}
+.kpi.warn{border-color:rgba(192,57,43,.3);background:linear-gradient(180deg,var(--red-soft) 0%,#fff 70%)}
+.kpi .lab{font-size:11.5px;color:var(--t3);font-weight:550;margin-bottom:6px}
+.kpi .val{font-size:24px;font-weight:660;letter-spacing:-0.03em;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .dlt{font-size:11px;margin-top:5px}
+.kpi .sub{font-size:11px;color:var(--t2);margin-top:4px}
+.delta.up{color:#137A4E;font-weight:650}
+.delta.down{color:var(--red);font-weight:650}
+.delta.flat,.delta.none{color:var(--t3)}
+.kpi-note{grid-column:1/-1;font-size:12px;color:var(--t3);background:var(--surface2);border:1px dashed var(--line);border-radius:10px;padding:9px 13px}
+
+/* ---------- chart bits ---------- */
+.chart-note{font-size:12px;color:var(--t2);margin-top:10px;line-height:1.55}
+.chart-note strong{color:var(--t1)}
+.stackbar{display:flex;height:26px;border-radius:8px;overflow:hidden;margin:8px 0 10px}
+.stackbar span{display:block;height:100%}
+.legend-row{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--t2);margin-bottom:4px}
+.legend-row i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.legend-row b{color:var(--t1);font-weight:640}
+
+/* chain */
+.chain{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;padding:10px 0 2px}
+.chain-step{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:9px 15px;text-align:center;min-width:96px}
+.chain-step .cs-lab{font-size:11px;color:var(--t3)}
+.chain-step .cs-lab i{font-style:normal;font-family:var(--mono);font-size:9.5px;color:#AEAEB2}
+.chain-step .cs-val{font-size:19px;font-weight:680;font-variant-numeric:tabular-nums;letter-spacing:-0.02em}
+.chain-op{display:flex;flex-direction:column;align-items:center;padding:0 2px}
+.chain-op .op{font-size:10.5px;color:var(--t3);font-family:var(--mono)}
+.chain-op .opv{font-size:12px;color:var(--blue);font-weight:650}
+
+/* ---------- action lists ---------- */
+.list-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 16px;display:flex;flex-direction:column}
+.list-card.good{border-color:rgba(16,163,127,.35)}
+.list-card.warn{border-color:rgba(180,83,9,.3)}
+.list-card.bad{border-color:rgba(192,57,43,.3)}
+.list-card.mute{opacity:.92}
+.lc-head{display:flex;align-items:center;gap:11px}
+.lc-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--surface2);flex-shrink:0}
+.good .lc-ic{background:var(--acc-soft);color:#0B6B52}
+.warn .lc-ic{background:var(--amb-soft);color:var(--amb)}
+.bad .lc-ic{background:var(--red-soft);color:var(--red)}
+.mute .lc-ic{background:#F1F1F4;color:var(--t2)}
+.lc-name{font-size:14px;font-weight:640}
+.lc-sub{font-size:11.5px;color:var(--t3)}
+.lc-n{margin-left:auto;font-size:26px;font-weight:700;letter-spacing:-0.03em;font-variant-numeric:tabular-nums}
+.good .lc-n{color:var(--acc)} .warn .lc-n{color:var(--amb)} .bad .lc-n{color:var(--red)} .mute .lc-n{color:var(--t2)}
+.lc-detail{font-size:12px;color:var(--t2);margin:9px 0 11px;line-height:1.55;flex:1}
+.btn-export{
+  font:inherit;font-size:12px;color:var(--t1);background:#fff;border:1px solid #D6D6DC;
+  border-radius:9px;padding:6px 12px;cursor:pointer;transition:.15s;align-self:flex-start;
+}
+.btn-export:hover{border-color:var(--acc);color:#0B6B52;background:var(--acc-soft)}
+
+/* ---------- bullets ---------- */
+.bullet-row{display:flex;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+.bullet-row:last-child{border-bottom:none}
+.bullet-lab{width:96px;font-size:13px;font-weight:600;flex-shrink:0}
+.bullet-track{flex:1;height:16px;background:var(--line-soft);border-radius:5px;position:relative;overflow:hidden}
+.bullet-target{position:absolute;left:0;top:0;bottom:0;background:#E3E3E8;display:block}
+.bullet-cur{position:absolute;left:0;top:0;bottom:0;display:block;border-radius:5px 0 0 5px;transition:.3s}
+.bullet-val{font-size:12.5px;color:var(--t2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tgt-input{width:64px;font:inherit;font-size:12.5px;padding:2px 6px;border:1px solid var(--line);border-radius:6px;background:#fff}
+
+/* ---------- headline ---------- */
+.headline{
+  background:linear-gradient(180deg,var(--acc-soft) 0%,#fff 80%);
+  border:1px solid rgba(16,163,127,.32);border-radius:14px;padding:15px 18px;
+  font-size:13.5px;line-height:1.65;color:var(--t1);
+}
+.headline b{color:#0B6B52}
+
+/* ---------- table ---------- */
+.table-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{
+  font:inherit;font-size:12px;color:var(--t2);background:#fff;border:1px solid var(--line);
+  border-radius:999px;padding:4px 11px;cursor:pointer;transition:.15s;
+}
+.chip b{color:var(--t1);font-weight:640}
+.chip:hover{border-color:#D6D6DC;color:var(--t1)}
+.chip.active{background:var(--t1);border-color:var(--t1);color:#fff}
+.chip.active b{color:#fff}
+.table-right{display:flex;gap:8px;align-items:center}
+#table-search{font:inherit;font-size:12.5px;padding:6px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;min-width:180px}
+#table-search:focus{outline:none;border-color:var(--acc)}
+.tbl-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:520px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff}
+th{position:sticky;top:0;background:var(--surface2);text-align:left;font-weight:640;font-size:11.5px;color:var(--t1);padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;z-index:2}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--acc)}
+th.sorted{color:var(--acc)}
+td{padding:8px 12px;border-bottom:1px solid var(--line-soft);white-space:nowrap}
+tbody tr:hover{background:#FCFCFD}
+td.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:11.5px;color:var(--t2)}
+td.mono{font-family:var(--mono);font-size:12px;color:var(--t1)}
+.tag{display:inline-block;font-size:10.5px;padding:1px 8px;border-radius:6px;font-weight:650}
+
+/* ---------- footer ---------- */
+.footer{border-top:1px solid var(--line);margin-top:56px;padding-top:22px;font-size:12.5px;color:var(--t3);line-height:1.7}
+.footer a{color:var(--t2)}
+.footer code{font-size:11.5px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="brand">TikTok <b>Creator ROI</b> Dashboard</span>
+    <span class="spacer"></span>
+    <select id="week-select" title="切换周 / 全周期"></select>
+    <span class="meta-chip" id="scope-label"></span>
+    <span class="meta-chip" id="data-updated"></span>
+    <a href="docs/design-spec.html" target="_blank" rel="noopener">设计说明书</a>
+    <a href="https://github.com/wangziyu618/tiktok-creator-roi-dashboard" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+  <div class="toc">
+    <a href="#m1">① 核心指标概览</a>
+    <a href="#m2">② 达人分层诊断</a>
+    <a href="#m3">③ ROI 多维拆解</a>
+    <a href="#m4">④ 优化策略与效果追踪</a>
+    <a href="#m5">⑤ 达人明细</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">TikTok Shop Affiliate · Commission-only · Pet Vertical</div>
+    <h1>纯佣达人 ROI 运营看板</h1>
+    <p class="sub">无坑位费、成本仅为结算佣金 + 寄样成本的纯佣模式下，看板围绕三条主线：双口径 ROI（现金 / 全成本）、按漏斗状态的达人七层分层、以及「曝光 × CTR × CTOR × AOV」的 GMV 精确归因。</p>
+    <div class="hl-chip" id="headline">加载中…</div>
+  </header>
+
+  <!-- ======== 模块一 ======== -->
+  <section id="m1">
+    <div class="sec-head"><span class="sec-num">MODULE 01</span><h2>核心指标概览</h2></div>
+    <p class="sec-desc">5 秒判断本周好坏：8 张 KPI 卡自带环比与口径注释；双 ROI 并列呈现，主动暴露纯佣模式的隐性样品成本。</p>
+    <div class="kpi-grid" id="kpi-grid"></div>
+    <div class="grid-31" style="margin-top:14px">
+      <div class="card"><h3>周度 GMV 与双口径 ROI</h3><div class="card-sub">柱 = GMV（左轴）· 蓝线 = 纯佣 ROI · 橙虚线 = 全成本 ROI（右轴）</div><div id="chart-combo"></div></div>
+      <div class="card"><h3>成本结构</h3><div class="card-sub">纯佣 ≠ 零成本：佣金 vs 样品</div><div id="chart-cost"></div></div>
+    </div>
+  </section>
+
+  <!-- ======== 模块二 ======== -->
+  <section id="m2">
+    <div class="sec-head"><span class="sec-num">MODULE 02</span><h2>达人分层诊断</h2></div>
+    <p class="sec-desc">按「漏斗状态 + 产出」将达人切成 S/A/B/C/D/E/F 七层（而不是只按 GMV 排名——99.3% 的达人 GMV 为 0，按 GMV 排会整图空白）。核心问题：资源给了谁、回报来自谁。</p>
+    <div class="grid-2">
+      <div class="card"><h3>转化漏斗：邀约 → 破零</h3><div class="card-sub">逐级转化率标注</div><div id="chart-funnel"></div></div>
+      <div class="card"><h3>七层 × 双占比</h3><div class="card-sub">人数分布 vs GMV 贡献 vs 样品消耗</div><div id="chart-tier"></div></div>
+      <div class="card"><h3>投入 vs 产出散点</h3><div class="card-sub">X = 寄样数 · Y = GMV · 气泡 = 曝光</div><div id="chart-scatter"></div></div>
+      <div class="card"><h3>GMV 集中度（帕累托）</h3><div class="card-sub">Top 达人累计贡献</div><div id="chart-pareto"></div></div>
+    </div>
+  </section>
+
+  <!-- ======== 模块三 ======== -->
+  <section id="m3">
+    <div class="sec-head"><span class="sec-num">MODULE 03</span><h2>ROI 多维度拆解</h2></div>
+    <p class="sec-desc">回答「数字为什么会变」。GMV 乘法链已用真实数据逐条反算验证（平均误差 0.3%），因此可以精确归因到因子级别。</p>
+    <div class="card" style="margin-bottom:14px"><h3>GMV 乘法链</h3><div class="card-sub">Impressions × CTR × CTOR × AOV</div><div id="chart-chain"></div></div>
+    <div class="grid-3">
+      <div class="card"><h3>内容形态 GMV 结构</h3><div class="card-sub">短视频 / 直播 / 商品卡</div><div id="chart-donut"></div></div>
+      <div class="card"><h3>CTR × CTOR 四象限</h3><div class="card-sub">虚线 = 出单达人中位数</div><div id="chart-quadrant"></div></div>
+      <div class="card"><h3>层级 × 周 GMV 热力</h3><div class="card-sub">复盘用：哪一周哪一层起量</div><div id="chart-heatmap"></div></div>
+    </div>
+  </section>
+
+  <!-- ======== 模块四 ======== -->
+  <section id="m4">
+    <div class="sec-head"><span class="sec-num">MODULE 04</span><h2>优化策略与效果追踪</h2></div>
+    <p class="sec-desc">把分析变成动作：四张可执行名单（点击导出 CSV），配合可编辑的目标子弹图。核心策略：把样品从 C/E 层重定向给已验证的 A/B 层。</p>
+    <div class="grid-4" id="list-cards" style="margin-bottom:14px"></div>
+    <div class="grid-31">
+      <div class="card">
+        <h3>目标达成追踪（Bullet）</h3>
+        <div class="card-sub">灰色底条 = 目标 · 彩色条 = 实际 · 目标值可直接编辑</div>
+        <div id="bullets"></div>
+      </div>
+      <div class="card">
+        <h3>干预对照（Before / After）</h3>
+        <div class="card-sub">策略效果追踪 · 累计数据满 2 周后启用</div>
+        <div class="chart-note" style="margin-top:4px">
+          在 <code>data/</code> 下维护 <code>D_Intervention.csv</code>（干预动作台账：达人 · 干预类型 · 干预周），
+          以干预周为分界对比前 2 周 vs 后 2 周的同组达人 GMV / 激活率变化，并保留未干预对照组作基准。
+          <strong>没有对照组，任何"优化有效"都只是自说自话。</strong><br><br>
+          建议记录的干预类型：追加 SKU / 提佣 / 催更 / 提供拍摄脚本 / 停止寄样。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== 模块五 ======== -->
+  <section id="m5">
+    <div class="sec-head"><span class="sec-num">MODULE 05</span><h2>达人明细</h2></div>
+    <p class="sec-desc">全量达人交叉表：点击表头排序、点击层级 chip 筛选、按 handle 搜索、一键导出当前视图。</p>
+    <div class="card" style="padding:14px 16px">
+      <div id="table-area"></div>
+    </div>
+  </section>
+
+  <div class="footer">
+    <div><b>数据管道</b>：TikTok Shop 后台按周区间导出 → <code>scripts/prepare.py</code> 清洗加列 → 追加至 <code>data/weeks/</code> → <code>scripts/build_data.py</code> 重打包 → 本页自动包含全部周（纯静态、零依赖）。</div>
+    <div style="margin-top:6px"><b>校验</b>：<code>node scripts/test_dashboard.js</code> —— 91 项断言覆盖 KPI / 分层 / 漏斗 / 名单 / 渲染，与本页使用同一套计算逻辑。</div>
+    <div style="margin-top:6px"><b>样品成本口径</b>：$<span id="usc">5.0</span>/件（货值 + 头程物流），可在 <code>scripts/prepare.py</code> 中按真实口径调整。设计说明书：<a href="docs/design-spec.html" target="_blank" rel="noopener">Tableau 落地版</a>。</div>
+  </div>
+
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script>document.getElementById('usc').textContent = Number(window.DATA.unit_sample_cost).toFixed(1);</script>
+</body>
+</html>
