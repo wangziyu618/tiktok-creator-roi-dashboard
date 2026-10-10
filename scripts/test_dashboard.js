@@ -123,17 +123,24 @@ ok('kpis refund 30.1%', r1.includes('30.1%'));
 const r2 = api.renderFunnel(m);
 ok('funnel has 1,646', r2.includes('1,646'));
 ok('funnel has 1.4%', r2.includes('1.4%'));
+ok('funnel rate >100% shown as multiple', r2.includes('覆盖 2.2×'));
 const r3 = api.renderTierShares(m);
 ok('tier chart has 625', r3.includes('625'));
 ok('tier chart has 96.6%', r3.includes('96.6%'));
 const r4 = api.renderPareto(m);
 ok('pareto top N label', r4.includes('Top 23'));
 ok('pareto 100%', r4.includes('100.0%'));
+eq('pareto labeled items (top8 handle+gmv)', (r4.match(/data-lab="1"/g) || []).length, 16);
 const r5 = api.renderScatter(m);
 ok('scatter has 769', r5.includes('769'));
+eq('scatter labeled creators (top8 with samples)', (r5.match(/data-lab="1"/g) || []).length, 8);
 const r6 = api.renderQuadrant(m);
 ok('quadrant has 435', r6.includes('435'));
 ok('quadrant has 23 位出单', r6.includes('23 位出单'));
+ok('quadrant axis capped (~31%)', r6.includes('31%'));
+ok('quadrant labels top gmv creator', r6.includes('creatorlinkz'));
+ok('quadrant labels ctor outlier', r6.includes('kayewhite02'));
+eq('quadrant labeled creators (6 top + 2 outliers)', (r6.match(/data-lab="1"/g) || []).length, 8);
 const r7 = api.renderDonut(m);
 ok('donut video 91.4%', r7.includes('91.4%'));
 ok('donut card 8.6%', r7.includes('8.6%'));
@@ -160,6 +167,32 @@ ok('chain has 351,968', r13.includes('351,968'));
 ok('chain has 1.73%', r13.includes('1.73%'));
 ok('chain has $55.08', r13.includes('$55.08'));
 ok('chain has 23 位出单', r13.includes('23 位出单'));
+
+console.log('== label collision geometry ==');
+function labBoxes(html, wPerChar, hHalf) {
+  const re = /<text data-lab="1" x="([\d.]+)" y="([\d.]+)"[^>]*>([^<]*)<\/text>/g;
+  const out = []; let mm;
+  while ((mm = re.exec(html))) {
+    const wpx = mm[3].length * wPerChar;
+    out.push({ l: +mm[1] - wpx / 2, r: +mm[1] + wpx / 2, t: +mm[2] - hHalf, b: +mm[2] + hHalf, s: mm[3] });
+  }
+  return out;
+}
+function overlapPairs(boxes) {
+  const pairs = [];
+  for (let i = 0; i < boxes.length; i++)
+    for (let j = i + 1; j < boxes.length; j++) {
+      const a = boxes[i], b = boxes[j];
+      if (!(a.r < b.l || a.l > b.r || a.b < b.t || a.t > b.b)) pairs.push(a.s + ' ~ ' + b.s);
+    }
+  return pairs;
+}
+const qPairs = overlapPairs(labBoxes(r6, 5.3, 6));
+eq('quadrant label overlaps', qPairs.length, 0);
+if (qPairs.length) console.log('    -> ' + qPairs.join('; '));
+const sPairs = overlapPairs(labBoxes(r5, 5.1, 5.5));
+eq('scatter label overlaps', sPairs.length, 0);
+if (sPairs.length) console.log('    -> ' + sPairs.join('; '));
 
 console.log('== index.html mount ids ==');
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');

@@ -279,7 +279,7 @@ td.mono{font-family:var(--mono);font-size:12px;color:var(--t1)}
 
   <div class="footer">
     <div><b>数据管道</b>：TikTok Shop 后台导出（多份重叠窗口）→ <code>scripts/merge_all.py</code> 按达人去重合并为全周期口径 → <code>data/merged/</code> → <code>scripts/build_data.py</code> 重打包 → 本页自动呈现（纯静态、零依赖）。合并规则与冲突明细见 <code>data/merged/merge_log.txt</code>。</div>
-    <div style="margin-top:6px"><b>校验</b>：<code>node scripts/test_dashboard.js</code> —— 135 项断言覆盖 KPI / 分层 / 漏斗 / 名单 / 渲染，与本页使用同一套计算逻辑。</div>
+    <div style="margin-top:6px"><b>校验</b>：<code>node scripts/test_dashboard.js</code> —— 144 项断言覆盖 KPI / 分层 / 漏斗 / 名单 / 渲染 / 标签碰撞几何，与本页使用同一套计算逻辑。</div>
     <div style="margin-top:6px"><b>样品成本口径</b>：$<span id="usc">5.0</span>/件（货值 + 头程物流），可在 <code>scripts/prepare.py</code> 中按真实口径调整。设计说明书：<a href="docs/design-spec.html" target="_blank" rel="noopener">Tableau 落地版</a>。</div>
   </div>
 

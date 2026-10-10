@@ -61,7 +61,7 @@ python scripts/build_data.py
 # 3) 打开看板（纯静态，双击 index.html 即可，或部署到任意静态托管）
 open index.html
 
-# 4) 校验计算逻辑（135 项断言）
+# 4) 校验计算逻辑（144 项断言）
 node scripts/test_dashboard.js
 ```
 
@@ -105,11 +105,11 @@ index.html              # 零依赖静态看板（GitHub Pages / 本地双击均
 
 ## 测试 / Tests
 
-`scripts/test_dashboard.js` 与页面共用同一套计算模块（`assets/app.js`），135 项断言覆盖：数据形状与 period 元数据、KPI 汇总（对照 Python 实算基准）、七层分层、漏斗、四张行动名单、四象限中位数、帕累托、渲染字符串冒烟，以及 index.html 挂载点完整性。
+`scripts/test_dashboard.js` 与页面共用同一套计算模块（`assets/app.js`），144 项断言覆盖：数据形状与 period 元数据、KPI 汇总（对照 Python 实算基准）、七层分层、漏斗、四张行动名单、四象限中位数、帕累托、渲染字符串冒烟，以及 index.html 挂载点完整性。
 
 ```bash
 node scripts/test_dashboard.js
-# -> ALL PASSED (135 assertions, 0 failures)
+# -> ALL PASSED (144 assertions, 0 failures)
 ```
 
 ## 目录结构 / Repository layout
@@ -129,7 +129,7 @@ node scripts/test_dashboard.js
     ├── merge_all.py            # 全周期合并：多份重叠导出 → 去重快照
     ├── build_data.py           # 打包 data/merged/（优先）或 data/weeks/ → assets/data.js
     ├── prepare.py              # 旧周度清洗脚本（legacy，供周度模式参考）
-    └── test_dashboard.js       # 135 项断言的冒烟测试
+    └── test_dashboard.js       # 144 项断言的冒烟测试
 ```
 
 ## 更新 SOP / Update SOP

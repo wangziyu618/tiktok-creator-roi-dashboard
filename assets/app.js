@@ -24,6 +24,31 @@
     const m = Math.floor(s.length / 2);
     return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
   };
+  const quantile = (a, q) => {
+    if (!a.length) return 0;
+    const s = a.slice().sort((x, y) => x - y);
+    return s[Math.min(s.length - 1, Math.floor(s.length * q))];
+  };
+
+  /* 贪心标签防碰撞：items = [{x, y, w, h}]，按上下交替的多档偏移尝试，
+   * 与已放置标签的近似矩形冲突则顺延；返回时给每个 item 赋 ly。 */
+  function layoutLabels(items) {
+    const placed = [];
+    const hit = (l, t, r, b) => placed.some(p => !(r < p.l || l > p.r || b < p.t || t > p.b));
+    const offsets = [-14, 16, -26, 28, -38, 40];
+    items.slice().sort((a, b) => a.x - b.x || a.y - b.y).forEach(it => {
+      let ly = null;
+      for (const off of offsets) {
+        const cy = it.y + off;
+        const l = it.x - it.w / 2, r = it.x + it.w / 2, t = cy - it.h / 2, b = cy + it.h / 2;
+        if (!hit(l, t, r, b)) { ly = cy; break; }
+      }
+      if (ly === null) ly = it.y + offsets[0]; // 放不下就接受重叠（极少发生）
+      placed.push({ l: it.x - it.w / 2, r: it.x + it.w / 2, t: ly - it.h / 2, b: ly + it.h / 2 });
+      it.ly = ly;
+    });
+    return items;
+  }
 
   const TIER_ORDER = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
   const TIER_META = {
@@ -441,8 +466,10 @@
         (0.42 + 0.58 * (1 - i / (f.length - 1))) + '"/>';
       s += txt(padL + bw + 10, y + bh / 2 + 3, fmtNum(d.n), { fill: '#1D1D1F', weight: 700, size: 12 });
       if (rate !== null) {
+        // 「获得曝光」含橱窗/商品卡曝光，可无内容而高于上一级，超过 100% 时按倍数展示
         s += txt(w - padR + 10, y + bh / 2 + 3,
-          '转化 ' + fmtPct(rate, 1), { size: 10.5, fill: rate < 0.05 ? NEG : '#6E6E73' });
+          rate > 1 ? '覆盖 ' + rate.toFixed(1) + '×' : '转化 ' + fmtPct(rate, 1),
+          { size: 10.5, fill: rate < 0.05 ? NEG : '#6E6E73' });
       }
     });
     return svgWrap(w, h, s) +
@@ -526,9 +553,17 @@
         '"><title>' + esc(c.handle) + ' · 样品 ' + c.samples + ' · GMV ' + fmtMoney(c.gmv, 2) +
         ' · 曝光 ' + fmtNum(c.impressions) + '</title></circle>';
     });
-    m.top.slice(0, 8).forEach(c => {
-      if (c.samples === 0) return;
-      s += txt(X(c.samples), Y(c.gmv) - 13, c.handle, { anchor: 'middle', size: 9, fill: '#0B6B52', weight: 600 });
+    // 头部达人标签：取「有寄样的达人」中 GMV Top 8，贪心防碰撞（先 clamp 再布局）
+    const labelPts = m.top.filter(c => c.samples > 0).slice(0, 8);
+    layoutLabels(labelPts.map(c => {
+      const wpx = c.handle.length * 5.1;
+      return {
+        c, x: Math.max(Math.min(X(c.samples), w - padR - wpx / 2), padL + wpx / 2),
+        y: Y(c.gmv), w: wpx, h: 11,
+      };
+    })).forEach(it => {
+      s += '<text data-lab="1" x="' + it.x + '" y="' + it.ly + '" font-size="9" text-anchor="middle" ' +
+        'fill="#0B6B52" font-weight="600">' + esc(it.c.handle) + '</text>';
     });
     s += txt(w / 2, h - 8, '寄样数（件）→', { anchor: 'middle', size: 10.5 });
     return svgWrap(w, h, s) +
@@ -560,10 +595,19 @@
       const x = padL + (d.i + 0.5) * (iw / n);
       const bh = (d.c.gmv / maxG) * ih;
       s += '<rect x="' + (x - bw / 2) + '" y="' + (padT + ih - bh) + '" width="' + bw +
-        '" height="' + bh + '" rx="4" fill="' + ACC + '" opacity="0.9"/>';
-      s += txt(x, padT + ih - bh - 5, fmtMoney(d.c.gmv, 0), { anchor: 'middle', size: 9, fill: '#1D1D1F', weight: 600 });
-      s += txt(x, h - padB + 14, d.c.handle.length > 13 ? d.c.handle.slice(0, 12) + '…' : d.c.handle,
-        { anchor: 'middle', size: 8.5 });
+        '" height="' + bh + '" rx="4" fill="' + ACC + '" opacity="0.9"><title>' +
+        esc(d.c.handle) + ' · GMV ' + fmtMoney(d.c.gmv, 2) + ' · 累计 ' +
+        (d.cum * 100).toFixed(1) + '%</title></rect>';
+      // 柱槽过窄（出单达人多时），GMV 值与 handle 只标注 Top 8，其余悬停查看；
+      // handle 旋转 -50° 以适应 24px 级窄槽
+      if (d.i < 8) {
+        s += '<text data-lab="1" x="' + x + '" y="' + (padT + ih - bh - 5) + '" font-size="9" text-anchor="middle" ' +
+          'fill="#1D1D1F" font-weight="600">' + esc(fmtMoney(d.c.gmv, 0)) + '</text>';
+        const hy = h - padB + 12;
+        s += '<text data-lab="1" x="' + x + '" y="' + hy + '" font-size="8" text-anchor="end" ' +
+          'fill="#6E6E73" transform="rotate(-50 ' + x + ' ' + hy + ')">' +
+          esc(d.c.handle.length > 11 ? d.c.handle.slice(0, 10) + '…' : d.c.handle) + '</text>';
+      }
       s += txt(x, h - padB + 26, (d.cum * 100).toFixed(0) + '%', { anchor: 'middle', size: 9, fill: BLUE, weight: 700 });
     });
     const line = data.map(d =>
@@ -575,7 +619,7 @@
     return svgWrap(w, h, s) +
       '<div class="chart-note">GMV 集中度：<strong>Top ' + data.length + ' 位达人贡献 ' +
       (data.length ? (data[data.length - 1].cum * 100).toFixed(1) : '0') +
-      '%</strong>。长尾塌陷意味着「复制爆款」比「广撒网」更紧迫。</div>';
+      '%</strong>（仅标注前 8 位，其余悬停柱子查看）。长尾塌陷意味着「复制爆款」比「广撒网」更紧迫。</div>';
   }
 
   function renderDonut(m) {
@@ -622,14 +666,15 @@
 
   function renderQuadrant(m) {
     const q = m.quadrant;
-    const w = 640, h = 320, padL = 52, padR = 16, padT = 16, padB = 46;
+    const w = 640, h = 320, padL = 52, padR = 16, padT = 20, padB = 46;
     const iw = w - padL - padR, ih = h - padT - padB;
-    const xs = q.ordered.map(c => c.ctrSrc).concat(q.stalled.map(c => c.ctrSrc));
-    const ys = q.ordered.map(c => c.ctorSrc);
-    const maxX = Math.max.apply(null, xs.concat([0.001])) * 1.15;
-    const maxY = Math.max.apply(null, ys.concat([0.001])) * 1.25;
-    const X = v => padL + (v / maxX) * iw;
-    const Y = v => padT + ih - (v / maxY) * ih;
+    // 坐标轴按分位数截断，避免极端值把散点压成一团；越界点贴边 + 箭头标记
+    const allCtr = q.ordered.map(c => c.ctrSrc).concat(q.stalled.map(c => c.ctrSrc));
+    const capX = Math.max(quantile(allCtr, 0.95), q.medCtr * 3, 0.05);
+    const capY = Math.max(quantile(q.ordered.map(c => c.ctorSrc), 0.9), q.medCtor * 3, 0.1);
+    const maxX = capX * 1.12, maxY = capY * 1.25;
+    const X = v => padL + (Math.min(v, capX) / maxX) * iw;
+    const Y = v => padT + ih - (Math.min(v, capY) / maxY) * ih;
     let s = '';
     for (let i = 0; i <= 4; i++) {
       const yy = padT + (ih / 4) * i;
@@ -641,15 +686,31 @@
     s += '<line x1="' + padL + '" y1="' + Y(q.medCtor) + '" x2="' + (w - padR) + '" y2="' + Y(q.medCtor) + '" stroke="#B9B9BF" stroke-dasharray="5 4"/>';
     // stalled mass on x-axis
     q.stalled.forEach(c => {
-      s += '<circle cx="' + X(Math.min(c.ctrSrc, maxX)) + '" cy="' + Y(0) + '" r="3.4" fill="' + AMB + '" opacity="0.25"><title>' +
+      s += '<circle cx="' + X(c.ctrSrc) + '" cy="' + Y(0) + '" r="3.4" fill="' + AMB + '" opacity="0.25"><title>' +
         esc(c.handle) + ' · CTR ' + fmtPct(c.ctrSrc, 2) + ' · CTOR 0 · 曝光 ' + fmtNum(c.impressions) + '</title></circle>';
     });
+    const outX = c => c.ctrSrc > capX, outY = c => c.ctorSrc > capY;
     q.ordered.forEach(c => {
-      s += '<circle cx="' + X(c.ctrSrc) + '" cy="' + Y(c.ctorSrc) + '" r="6" fill="' + ACC +
+      const px = X(c.ctrSrc), py = Y(c.ctorSrc);
+      s += '<circle cx="' + px + '" cy="' + py + '" r="6" fill="' + ACC +
         '" stroke="#fff" stroke-width="1.6"><title>' + esc(c.handle) + ' · CTR ' + fmtPct(c.ctrSrc, 2) +
         ' · CTOR ' + fmtPct(c.ctorSrc, 2) + ' · GMV ' + fmtMoney(c.gmv, 2) + '</title></circle>';
-      const lx = Math.max(Math.min(X(c.ctrSrc), w - padR - 10), padL + 4);
-      s += txt(lx, Y(c.ctorSrc) - 11, c.handle, { anchor: 'middle', size: 9.3, fill: '#0B6B52', weight: 600 });
+      // 越界箭头：↑ = 真实 CTOR 超出顶轴，→ = 真实 CTR 超出右轴
+      if (outY(c)) s += txt(px, py - 11, '▲', { anchor: 'middle', size: 9, fill: POS, weight: 700 });
+      if (outX(c)) s += txt(px - 10, py + 3, '▶', { anchor: 'end', size: 8, fill: POS, weight: 700 });
+    });
+    // 只标注头部出单达人 + 越界极端值，贪心防碰撞（先 clamp 到轴域内再布局）
+    const labelSet = q.ordered.slice().sort((a, b) => b.gmv - a.gmv).slice(0, 6);
+    q.ordered.forEach(c => { if ((outX(c) || outY(c)) && labelSet.indexOf(c) < 0) labelSet.push(c); });
+    layoutLabels(labelSet.map(c => {
+      const wpx = c.handle.length * 5.3;
+      return {
+        c, x: Math.max(Math.min(X(c.ctrSrc), w - padR - wpx / 2), padL + wpx / 2),
+        y: Y(c.ctorSrc), w: wpx, h: 12,
+      };
+    })).forEach(it => {
+      s += '<text data-lab="1" x="' + it.x + '" y="' + it.ly + '" font-size="9.3" text-anchor="middle" ' +
+        'fill="#0B6B52" font-weight="600">' + esc(it.c.handle) + '</text>';
     });
     // quadrant labels
     s += txt(w - padR - 8, padT + 14, '加码区（高CTR · 高CTOR）', { anchor: 'end', size: 10, fill: POS, weight: 700 });
@@ -659,7 +720,8 @@
     s += txt(w / 2, h - 8, 'CTR 点击率 →（虚线 = 出单达人中位数 ' + fmtPct(q.medCtr, 2) + '）', { anchor: 'middle', size: 10 });
     return svgWrap(w, h, s) +
       '<div class="chart-note">橙点 = ' + fmtNum(q.stalled.length) + ' 位「有曝光无下单」达人（CTOR = 0，堆在横轴上）；' +
-      '绿点 = ' + fmtNum(q.ordered.length) + ' 位出单达人。<strong>当前短板在 CTOR 而非 CTR</strong>：' +
+      '绿点 = ' + fmtNum(q.ordered.length) + ' 位出单达人（仅标注头部，悬停查看全部；坐标轴按 P90–P95 截断，' +
+      '▲/▶ 表示真实值超出轴域）。<strong>当前短板在 CTOR 而非 CTR</strong>：' +
       '内容能带点击，但落地页承接不住（价格锚点 / 评分 / 评价数 / 主图）。</div>';
   }
 
